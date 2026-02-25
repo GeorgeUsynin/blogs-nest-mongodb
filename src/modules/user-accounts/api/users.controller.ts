@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../application';
 import { UsersQueryRepository } from '../infrastructure';
-import { PaginatedViewDto } from 'src/core/dto';
+import { PaginatedViewDto } from '../../../core/dto';
 import {
   CreateUserInputDto,
   GetUsersQueryParamsInputDto,

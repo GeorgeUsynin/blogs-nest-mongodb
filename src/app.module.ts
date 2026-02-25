@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserAccountsModule } from './modules';
+import { BloggersPlatformModule, UserAccountsModule } from './modules';
 
 @Module({
   imports: [
@@ -10,9 +8,8 @@ import { UserAccountsModule } from './modules';
     MongooseModule.forRoot('mongodb://localhost:27017', {
       dbName: 'nest-bloggers-platform-mongodb',
     }),
+    BloggersPlatformModule,
     UserAccountsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

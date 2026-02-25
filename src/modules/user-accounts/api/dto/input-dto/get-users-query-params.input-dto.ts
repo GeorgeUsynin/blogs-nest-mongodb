@@ -1,4 +1,4 @@
-import { BaseQueryParamsInputDto } from 'src/core/dto';
+import { BaseQueryParamsInputDto } from '../../../../../core/dto';
 import { UserSortByFields } from './users-sort-by-fields';
 
 export class GetUsersQueryParamsInputDto extends BaseQueryParamsInputDto {

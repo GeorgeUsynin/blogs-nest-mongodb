@@ -22,7 +22,7 @@ export class UsersService {
   async createUser(
     dto: CreateUserDto,
     options: TOptions = { shouldBeConfirmed: false },
-  ) {
+  ): Promise<string> {
     const { email, login, password } = dto;
 
     const userWithExistedLogin =

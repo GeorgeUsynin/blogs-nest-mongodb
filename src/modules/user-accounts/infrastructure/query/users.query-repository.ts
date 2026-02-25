@@ -23,6 +23,7 @@ export class UsersQueryRepository {
     } = query;
 
     const filter: QueryFilter<UserDocument> = {};
+
     if (searchLoginTerm) {
       filter.$or = filter.$or || [];
       filter.$or.push({
