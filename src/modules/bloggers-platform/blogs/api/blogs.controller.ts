@@ -19,6 +19,13 @@ import {
   GetBlogsQueryParamsInputDto,
   UpdateBlogInputDto,
 } from './dto';
+import {
+  CreateBlogApi,
+  DeleteBlogApi,
+  GetAllBlogsApi,
+  GetBlogApi,
+  UpdateBlogApi,
+} from './swagger';
 
 @Controller('blogs')
 export class BlogsController {
@@ -29,6 +36,7 @@ export class BlogsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @GetAllBlogsApi()
   async getAllBlogs(
     @Query() query: GetBlogsQueryParamsInputDto,
   ): Promise<PaginatedViewDto<BlogViewDto>> {
@@ -47,6 +55,7 @@ export class BlogsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @GetBlogApi()
   async getBlogById(@Param('id') id: string): Promise<BlogViewDto> {
     const foundBlog = await this.blogsQueryRepository.getBlogById(id);
 
@@ -60,6 +69,7 @@ export class BlogsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @CreateBlogApi()
   async createBlog(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId = await this.blogsService.createBlog(body);
 
@@ -75,6 +85,7 @@ export class BlogsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UpdateBlogApi()
   async updateBlogById(
     @Param('id') id: string,
     @Body() body: UpdateBlogInputDto,
@@ -84,6 +95,7 @@ export class BlogsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @DeleteBlogApi()
   async deleteBlog(@Param('id') id: string): Promise<void> {
     await this.blogsService.deleteBlog(id);
   }

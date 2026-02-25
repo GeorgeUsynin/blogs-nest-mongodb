@@ -1,5 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, SchemaTimestampsConfig } from 'mongoose';
+import {
+  HydratedDocument,
+  Model,
+  Query,
+  SchemaTimestampsConfig,
+} from 'mongoose';
 import { CreateUserDomainDto } from './dto';
 import { emailConstraints, loginConstraints } from './user.entity-constraints';
 
@@ -63,11 +68,9 @@ UserSchema.loadClass(User);
 
 // Apply soft-delete filtering to read queries by default:
 // exclude documents marked as `isDeleted: true` for find/findOne/countDocuments.
-UserSchema.pre('find', function () {
-  this.where({ isDeleted: false });
-});
-UserSchema.pre('findOne', function () {
-  this.where({ isDeleted: false });
+UserSchema.pre(/^find/, function () {
+  const that = this as Query<unknown, UserDocument>;
+  that.where({ isDeleted: false });
 });
 UserSchema.pre('countDocuments', function () {
   this.where({ isDeleted: false });

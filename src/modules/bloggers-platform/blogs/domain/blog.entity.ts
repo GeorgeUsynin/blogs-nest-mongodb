@@ -1,5 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, SchemaTimestampsConfig } from 'mongoose';
+import {
+  HydratedDocument,
+  Model,
+  SchemaTimestampsConfig,
+  Query,
+} from 'mongoose';
 import { CreateBlogDomainDto, UpdateBlogDomainDto } from './dto';
 
 export const websiteUrlConstraints = {
@@ -74,11 +79,9 @@ BlogSchema.loadClass(Blog);
 
 // Apply soft-delete filtering to read queries by default:
 // exclude documents marked as `isDeleted: true` for find/findOne/countDocuments.
-BlogSchema.pre('find', function () {
-  this.where({ isDeleted: false });
-});
-BlogSchema.pre('findOne', function () {
-  this.where({ isDeleted: false });
+BlogSchema.pre(/^find/, function () {
+  const that = this as Query<unknown, BlogDocument>;
+  that.where({ isDeleted: false });
 });
 BlogSchema.pre('countDocuments', function () {
   this.where({ isDeleted: false });
