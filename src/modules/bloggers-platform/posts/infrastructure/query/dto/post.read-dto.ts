@@ -1,7 +1,7 @@
 import { LikeStatus } from '../../../../likes/domain';
 import { Post } from '../../../domain';
 
-export type TNewestLikes = {
+type TNewestLikes = {
   createdAt: Date;
   authorId: string;
   authorLogin: string;

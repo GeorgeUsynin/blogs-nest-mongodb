@@ -2,21 +2,19 @@ import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
-  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiParam,
   ApiProperty,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { contentConstraints } from '../../domain';
 // import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
-import {
-  CreateCommentInputDto,
-  CommentViewDto,
-} from '../../../comments/api/dto';
-import { contentConstraints } from '../../../comments/domain';
+import { UpdateCommentInputDto } from '../dto';
 
-export class SwaggerCreateCommentInputDto implements CreateCommentInputDto {
+export class SwaggerUpdateCommentInputDto implements UpdateCommentInputDto {
   @ApiProperty({
     type: String,
     minLength: contentConstraints.minLength,
@@ -25,30 +23,32 @@ export class SwaggerCreateCommentInputDto implements CreateCommentInputDto {
   content: string;
 }
 
-export const CreateCommentByPostIdApi = () => {
+export const UpdateCommentApi = () => {
   return applyDecorators(
     ApiOperation({
-      summary: 'Create new comment for specified post',
+      summary: 'Update existing comment by id with InputModel',
     }),
-    ApiParam({ name: 'postId', type: String, description: 'Post id' }),
+    ApiParam({ name: 'id', type: String, description: 'Comment id' }),
     ApiBody({
-      type: SwaggerCreateCommentInputDto,
-      description: 'Data for constructing new comment entity',
+      type: SwaggerUpdateCommentInputDto,
+      description: 'Data for updating',
       required: false,
     }),
-    ApiCreatedResponse({
-      type: CommentViewDto,
-      description: 'Returns the newly created comment',
+    ApiNoContentResponse({
+      description: 'No Content',
     }),
     ApiBadRequestResponse({
       description: 'If the inputModel has incorrect values',
-      //   type: SwaggerErrorsMessagesViewDto,
+      // type: SwaggerErrorsMessagesViewDto,
     }),
     ApiUnauthorizedResponse({
       description: 'Unauthorized',
     }),
+    ApiForbiddenResponse({
+      description: 'If try edit the comment that is not your own',
+    }),
     ApiNotFoundResponse({
-      description: "If specified post doesn't exists",
+      description: 'Not Found',
     }),
   );
 };

@@ -6,24 +6,30 @@ class NewestLike {
   @ApiProperty({ type: Date })
   addedAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   userId: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   login: string;
 }
 
 class ExtendedLikesInfo {
-  @ApiProperty()
+  @ApiProperty({ type: Number, description: 'Total likes for parent item' })
   likesCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number, description: 'Total dislikes for parent item' })
   dislikesCount: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: LikeStatus,
+    description: 'Send None if you want to unlike\/undislike',
+  })
   myStatus: LikeStatus;
 
-  @ApiProperty({ type: [NewestLike] })
+  @ApiProperty({
+    type: [NewestLike],
+    description: 'Last 3 likes',
+  })
   newestLikes: NewestLike[];
 }
 

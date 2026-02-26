@@ -35,7 +35,7 @@ export class BlogsService {
       websiteUrl: dto.websiteUrl,
     };
 
-    foundBlog.update(updateBlogDomainDto);
+    foundBlog.updateBlog(updateBlogDomainDto);
 
     await this.blogsRepository.save(foundBlog);
   }

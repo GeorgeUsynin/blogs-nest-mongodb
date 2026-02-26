@@ -1,10 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
-  HydratedDocument,
-  Model,
-  SchemaTimestampsConfig,
-  Query,
-} from 'mongoose';
+import { HydratedDocument, Model, Query } from 'mongoose';
 import { CreatePostDomainDto, UpdatePostDomainDto } from './dto';
 import {
   contentConstraints,
@@ -71,7 +66,7 @@ export class Post extends Likeable {
     this.deletedAt = new Date();
   }
 
-  update(dto: UpdatePostDomainDto) {
+  updatePost(dto: UpdatePostDomainDto) {
     this.title = dto.title;
     this.shortDescription = dto.shortDescription;
     this.content = dto.content;

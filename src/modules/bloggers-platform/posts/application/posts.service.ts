@@ -45,7 +45,7 @@ export class PostsService {
       blogId: dto.blogId,
     };
 
-    foundPost.update(updatePostDomainDto);
+    foundPost.updatePost(updatePostDomainDto);
 
     await this.postsRepository.save(foundPost);
   }

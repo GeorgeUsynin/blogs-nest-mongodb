@@ -1,0 +1,2 @@
+export { CommentsRepository } from './comments.repository';
+export { CommentsQueryRepository } from './query';

@@ -11,7 +11,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostsService } from '../application';
+import { CommentsService } from '../../comments/application';
 import { PostsQueryRepository } from '../infrastructure';
+import { CommentsQueryRepository } from '../../comments/infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
 import {
   PostViewDto,
@@ -20,19 +22,27 @@ import {
   UpdatePostInputDto,
 } from './dto';
 import {
+  CommentViewDto,
+  CreateCommentInputDto,
+  GetCommentsQueryParamsInputDto,
+} from '../../comments/api/dto';
+import {
   GetAllPostsApi,
   GetPostApi,
   GetAllCommentsByPostIdApi,
   CreatePostApi,
   DeletePostApi,
   UpdatePostApi,
+  CreateCommentByPostIdApi,
 } from './swagger';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private postsQueryRepository: PostsQueryRepository,
     private postsService: PostsService,
+    private commentsService: CommentsService,
+    private postsQueryRepository: PostsQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get()
@@ -68,9 +78,35 @@ export class PostsController {
     return PostViewDto.mapToView(foundPost);
   }
 
-  // getAllCommentsByPostId
+  @Get(':postId/comments')
+  @HttpCode(HttpStatus.OK)
+  @GetAllCommentsByPostIdApi()
+  async getAllCommentsByPostId(
+    @Param('postId') postId: string,
+    @Query() query: GetCommentsQueryParamsInputDto,
+  ) {
+    const foundPost = await this.postsQueryRepository.getPostById(postId);
+    if (!foundPost) {
+      // throw new PostNotFoundError();
+      throw new Error();
+    }
 
-  // createCommentByPostId
+    const { items, totalCount } =
+      await this.commentsQueryRepository.getAllCommentsByPostId(
+        postId,
+        query,
+        '',
+      );
+
+    const mappedItems = items.map(CommentViewDto.mapToView);
+
+    return PaginatedViewDto.mapToView({
+      items: mappedItems,
+      page: query.pageNumber,
+      size: query.pageSize,
+      totalCount,
+    });
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -86,6 +122,30 @@ export class PostsController {
     }
 
     return PostViewDto.mapToView(createdPost);
+  }
+
+  @Post('/:postId/comments')
+  @HttpCode(HttpStatus.CREATED)
+  @CreateCommentByPostIdApi()
+  async createCommentByPostId(
+    @Param('postId') postId: string,
+    @Body() body: CreateCommentInputDto,
+  ) {
+    const commentId = await this.commentsService.createComment(
+      postId,
+      '',
+      body,
+    );
+
+    const createdComment =
+      await this.commentsQueryRepository.getCommentById(commentId);
+
+    if (!createdComment) {
+      // throw new CommentCreationFailedError();
+      throw new Error();
+    }
+
+    return CommentViewDto.mapToView(createdComment);
   }
 
   @Put(':id')

@@ -1,10 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
-  HydratedDocument,
-  Model,
-  SchemaTimestampsConfig,
-  Query,
-} from 'mongoose';
+import { HydratedDocument, Model, Query } from 'mongoose';
 import { CreateBlogDomainDto, UpdateBlogDomainDto } from './dto';
 import {
   descriptionConstraints,
@@ -65,7 +60,7 @@ export class Blog {
     this.deletedAt = new Date();
   }
 
-  update(dto: UpdateBlogDomainDto) {
+  updateBlog(dto: UpdateBlogDomainDto) {
     this.name = dto.name;
     this.description = dto.description;
     this.websiteUrl = dto.websiteUrl;

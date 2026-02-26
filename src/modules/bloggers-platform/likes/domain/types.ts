@@ -3,3 +3,10 @@ export enum LikeStatus {
   Like = 'Like',
   Dislike = 'Dislike',
 }
+
+export enum ParentType {
+  Comment = 'comment',
+  Post = 'post',
+}
+
+export type NonNoneLikeStatus = Exclude<LikeStatus, LikeStatus.None>;

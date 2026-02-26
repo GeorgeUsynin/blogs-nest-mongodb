@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument, type PostModelType } from '../../domain';
+import { Post, type PostModelType } from '../../domain';
 import { GetPostsQueryParamsInputDto } from '../../api/dto';
 import { PostReadDto } from './dto';
 import { LikeStatus } from '../../../likes/domain';
 
-type FindPostsFilter = Partial<Pick<PostDocument, 'blogId'>>;
+type FindPostsFilter = Partial<Pick<Post, 'blogId'>>;
 
 @Injectable()
 export class PostsQueryRepository {
@@ -29,7 +29,7 @@ export class PostsQueryRepository {
     return this.findManyWithFilter(query, { blogId });
   }
 
-  async findManyWithFilter(
+  private async findManyWithFilter(
     query: GetPostsQueryParamsInputDto,
     filter: FindPostsFilter = {},
     userId?: string,
