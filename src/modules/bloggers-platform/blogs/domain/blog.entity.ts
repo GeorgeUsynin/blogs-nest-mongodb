@@ -6,25 +6,15 @@ import {
   Query,
 } from 'mongoose';
 import { CreateBlogDomainDto, UpdateBlogDomainDto } from './dto';
+import {
+  descriptionConstraints,
+  nameConstraints,
+  websiteUrlConstraints,
+} from './blog.entity-constraints';
 
-export const websiteUrlConstraints = {
-  maxLength: 100,
-  match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
-};
-
-export const nameConstraints = {
-  maxLength: 15,
-};
-
-export const descriptionConstraints = {
-  maxLength: 500,
-};
-
-export // The timestamp flag automatically adds the updatedAt and createdAt fields
-
-
+// The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
-class Blog {
+export class Blog {
   @Prop({ type: String, required: true, ...nameConstraints })
   name: string;
 
@@ -44,8 +34,17 @@ class Blog {
   @Prop({ type: Boolean, default: false })
   isDeleted: boolean;
 
+  @Prop({ type: Date, default: null })
+  deletedAt: Date | null;
+
+  @Prop({ type: Date })
+  createdAt: Date;
+
+  @Prop({ type: Date })
+  updatedAt: Date;
+
   static createBlog(dto: CreateBlogDomainDto): BlogDocument {
-    // user -> BlogDocument
+    // blog -> BlogDocument
     // this -> BlogModel
     const blog = new this();
 
@@ -63,6 +62,7 @@ class Blog {
     }
 
     this.isDeleted = true;
+    this.deletedAt = new Date();
   }
 
   update(dto: UpdateBlogDomainDto) {
@@ -88,7 +88,7 @@ BlogSchema.pre('countDocuments', function () {
 });
 
 // Type of the document
-export type BlogDocument = HydratedDocument<Blog> & SchemaTimestampsConfig;
+export type BlogDocument = HydratedDocument<Blog>;
 
 // Type of the model + static methods
 export type BlogModelType = Model<BlogDocument> & typeof Blog;

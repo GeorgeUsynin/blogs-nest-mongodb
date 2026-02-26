@@ -36,6 +36,6 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(id: string): Promise<BlogDocument | null> {
-    return this.BlogModel.findById(id);
+    return this.BlogModel.findById(id).lean().exec();
   }
 }

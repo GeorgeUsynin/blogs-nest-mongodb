@@ -52,6 +52,6 @@ export class UsersQueryRepository {
   }
 
   async getUserById(id: string): Promise<UserDocument | null> {
-    return this.UserModel.findById(id);
+    return this.UserModel.findById(id).lean().exec();
   }
 }

@@ -1,20 +1,17 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import {
-  Blog,
-  BlogSchema,
-  BlogsController,
-  BlogsQueryRepository,
-  BlogsRepository,
-  BlogsService,
-} from './blogs';
+import { Blog, BlogSchema, BlogsController, blogsProviders } from './blogs';
+import { Post, PostSchema, PostsController, postsProviders } from './posts';
 
-const controllers = [BlogsController];
-const providers = [BlogsService, BlogsRepository, BlogsQueryRepository];
+const controllers = [BlogsController, PostsController];
+const providers = [...blogsProviders, ...postsProviders];
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
+    MongooseModule.forFeature([
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
+    ]),
   ],
   controllers: [...controllers],
   providers: [...providers],

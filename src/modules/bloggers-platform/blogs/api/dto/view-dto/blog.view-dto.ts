@@ -1,4 +1,3 @@
-import { SchemaTimestampsConfig } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { BlogDocument } from '../../../domain';
 
@@ -22,7 +21,7 @@ export class BlogViewDto {
   isMembership: boolean;
 
   @ApiProperty({ type: Date })
-  createdAt: SchemaTimestampsConfig['createdAt'];
+  createdAt: Date;
 
   public static mapToView(blog: BlogDocument): BlogViewDto {
     const dto = new BlogViewDto();

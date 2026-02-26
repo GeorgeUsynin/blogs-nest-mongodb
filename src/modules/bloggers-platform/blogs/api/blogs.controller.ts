@@ -11,18 +11,24 @@ import {
   Query,
 } from '@nestjs/common';
 import { BlogsService } from '../application';
+import { PostsService } from '../../posts/application';
 import { BlogsQueryRepository } from '../infrastructure';
+import { PostsQueryRepository } from '../../posts/infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
 import {
   BlogViewDto,
   CreateBlogInputDto,
+  CreatePostWithoutBlogIdInputDto,
   GetBlogsQueryParamsInputDto,
   UpdateBlogInputDto,
 } from './dto';
+import { GetPostsQueryParamsInputDto, PostViewDto } from '../../posts/api/dto';
 import {
   CreateBlogApi,
+  CreatePostByBlogIdApi,
   DeleteBlogApi,
   GetAllBlogsApi,
+  GetAllPostsByBlogIdApi,
   GetBlogApi,
   UpdateBlogApi,
 } from './swagger';
@@ -31,7 +37,9 @@ import {
 export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
+    private postsQueryRepository: PostsQueryRepository,
     private blogsService: BlogsService,
+    private postsService: PostsService,
   ) {}
 
   @Get()
@@ -67,6 +75,33 @@ export class BlogsController {
     return BlogViewDto.mapToView(foundBlog);
   }
 
+  @Get(':blogId/posts')
+  @HttpCode(HttpStatus.OK)
+  @GetAllPostsByBlogIdApi()
+  async getPostsByBlogId(
+    @Param('blogId') blogId: string,
+    @Query() query: GetPostsQueryParamsInputDto,
+  ) {
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
+
+    if (!blog) {
+      // throw new BlogNotFoundError();
+      throw new Error();
+    }
+
+    const { items, totalCount } =
+      await this.postsQueryRepository.getAllPostsByBlogId(blogId, query);
+
+    const mappedItems = items.map(PostViewDto.mapToView);
+
+    return PaginatedViewDto.mapToView({
+      items: mappedItems,
+      page: query.pageNumber,
+      size: query.pageSize,
+      totalCount,
+    });
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @CreateBlogApi()
@@ -81,6 +116,25 @@ export class BlogsController {
     }
 
     return BlogViewDto.mapToView(createdBlog);
+  }
+
+  @Post(':blogId/posts')
+  @HttpCode(HttpStatus.CREATED)
+  @CreatePostByBlogIdApi()
+  async createPostForBlogByBlogId(
+    @Param('blogId') blogId: string,
+    @Body() body: CreatePostWithoutBlogIdInputDto,
+  ) {
+    const postId = await this.postsService.createPost({ ...body, blogId });
+
+    const createdPost = await this.postsQueryRepository.getPostById(postId);
+
+    if (!createdPost) {
+      // throw new PostCreationFailedError();
+      throw new Error();
+    }
+
+    return PostViewDto.mapToView(createdPost);
   }
 
   @Put(':id')

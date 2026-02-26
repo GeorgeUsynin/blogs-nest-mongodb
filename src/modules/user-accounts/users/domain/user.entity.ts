@@ -26,6 +26,12 @@ export class User {
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
 
+  @Prop({ type: Date })
+  createdAt: Date;
+
+  @Prop({ type: Date })
+  updatedAt: Date;
+
   static createConfirmedUser(dto: CreateUserDomainDto): UserDocument {
     // user -> UserDocument
     // this -> UserModel
@@ -77,7 +83,7 @@ UserSchema.pre('countDocuments', function () {
 });
 
 // Type of the document
-export type UserDocument = HydratedDocument<User> & SchemaTimestampsConfig;
+export type UserDocument = HydratedDocument<User>;
 
 // Type of the model + static methods
 export type UserModelType = Model<UserDocument> & typeof User;

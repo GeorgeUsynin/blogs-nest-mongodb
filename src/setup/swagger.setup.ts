@@ -5,6 +5,7 @@ import { GLOBAL_PREFIX } from './global-prefix.setup';
 export function swaggerSetup(app: INestApplication) {
   const config = new DocumentBuilder()
     .setTitle('BLOGGER API')
+    .setDescription('Blogs API documentation')
     .addBasicAuth()
     .addBearerAuth({
       type: 'http',

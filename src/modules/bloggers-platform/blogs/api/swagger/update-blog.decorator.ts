@@ -14,7 +14,7 @@ import {
   descriptionConstraints,
   nameConstraints,
   websiteUrlConstraints,
-} from '../../domain/blog.entity';
+} from '../../domain';
 import { UpdateBlogInputDto } from '../dto';
 
 export class SwaggerUpdateBlogInputDto implements UpdateBlogInputDto {

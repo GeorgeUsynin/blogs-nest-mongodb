@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SchemaTimestampsConfig } from 'mongoose';
 import { UserDocument } from '../../../domain';
 
 export class UserViewDto {
@@ -13,7 +12,7 @@ export class UserViewDto {
   email: string;
 
   @ApiProperty({ type: Date })
-  createdAt: SchemaTimestampsConfig['createdAt'];
+  createdAt: Date;
 
   public static mapToView(user: UserDocument): UserViewDto {
     const dto = new UserViewDto();

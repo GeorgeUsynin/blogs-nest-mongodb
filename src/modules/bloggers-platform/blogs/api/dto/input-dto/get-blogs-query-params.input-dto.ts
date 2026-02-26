@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseQueryParamsInputDto } from '../../../../../../core/dto';
-import { BlogSortByFields } from './blogs-sort-by-fields';
+import { BlogSortByFields } from './blog-sort-by-fields';
 
 export class GetBlogsQueryParamsInputDto extends BaseQueryParamsInputDto {
   @ApiProperty({

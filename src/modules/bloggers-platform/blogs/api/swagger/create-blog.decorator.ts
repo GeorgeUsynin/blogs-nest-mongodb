@@ -13,7 +13,7 @@ import {
   descriptionConstraints,
   nameConstraints,
   websiteUrlConstraints,
-} from '../../domain/blog.entity';
+} from '../../domain';
 
 export class SwaggerCreateBlogInputDto implements CreateBlogInputDto {
   @ApiProperty({
