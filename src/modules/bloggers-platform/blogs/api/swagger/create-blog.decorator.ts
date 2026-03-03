@@ -7,7 +7,7 @@ import {
   ApiProperty,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-// import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
+import { SwaggerErrorsMessagesViewDto } from '../../../../../core/dto';
 import { BlogViewDto, CreateBlogInputDto } from '../dto';
 import {
   descriptionConstraints,
@@ -52,7 +52,7 @@ export const CreateBlogApi = () => {
       description: 'Returns the newly created blog',
     }),
     ApiBadRequestResponse({
-      // type: SwaggerErrorsMessagesViewDto,
+      type: SwaggerErrorsMessagesViewDto,
       description: 'If the inputModel has incorrect values',
     }),
     ApiUnauthorizedResponse({

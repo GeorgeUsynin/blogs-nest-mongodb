@@ -11,9 +11,12 @@ export class DomainExceptionsFilter extends BaseExceptionFilter {
     response: Response,
     request: Request,
   ): void {
+    const status = this.domainErrorToHttpStatus(exception.code);
+    const errorsMessages = this.createErrorMessages([exception]);
+
     response
-      .status(this.domainErrorToHttpStatus(exception.code))
-      .json(this.getDefaultHttpBody(request.url, exception));
+      .status(status)
+      .json(this.getDefaultHttpBody(request.url, status, errorsMessages));
   }
 
   domainErrorToHttpStatus(code: ErrorCode) {

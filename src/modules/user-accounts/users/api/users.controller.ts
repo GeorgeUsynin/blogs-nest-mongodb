@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application';
 import { UsersQueryRepository } from '../infrastructure';
@@ -28,8 +29,11 @@ import {
   UserCreationFailedError,
   UserNotFoundError,
 } from '../../../../core/exceptions';
+import { BasicAuthGuard } from '../guards/basic';
+import { Public } from '../guards/decorators';
 
 @Controller('users')
+@UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
@@ -55,6 +59,7 @@ export class UsersController {
     });
   }
 
+  @Public()
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @GetUserApi()

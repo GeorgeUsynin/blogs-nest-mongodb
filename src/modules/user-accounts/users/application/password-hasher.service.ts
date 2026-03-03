@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
+import { SALT_ROUNDS } from './constants';
 
 @Injectable()
 export class PasswordHasherService {
   async hashPassword(password: string): Promise<string> {
-    // TODO: move salt rounds to settings
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(SALT_ROUNDS);
 
     return bcrypt.hash(password, salt);
   }

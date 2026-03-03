@@ -11,15 +11,14 @@ import {
 
 const controllers = [BlogsController, PostsController, CommentsController];
 const providers = [...blogsProviders, ...postsProviders, ...commentsProviders];
+const mongooseModels = [
+  { name: Blog.name, schema: BlogSchema },
+  { name: Post.name, schema: PostSchema },
+  { name: Comment.name, schema: CommentSchema },
+];
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Blog.name, schema: BlogSchema },
-      { name: Post.name, schema: PostSchema },
-      { name: Comment.name, schema: CommentSchema },
-    ]),
-  ],
+  imports: [MongooseModule.forFeature(mongooseModels)],
   controllers: [...controllers],
   providers: [...providers],
 })

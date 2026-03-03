@@ -22,6 +22,7 @@ export const ErrorCodes = {
   POST_CREATION_FAILED: 'POST_CREATION_FAILED',
   COMMENT_CREATION_FAILED: 'COMMENT_CREATION_FAILED',
   USER_CREATION_FAILED: 'USER_CREATION_FAILED',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -51,6 +52,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCodes.POST_CREATION_FAILED]: 'Post creation failed',
   [ErrorCodes.COMMENT_CREATION_FAILED]: 'Comment creation failed',
   [ErrorCodes.USER_CREATION_FAILED]: 'User creation failed',
+  [ErrorCodes.INVALID_CREDENTIALS]: 'Invalid credentials',
 };
 
 export const ErrorFields = {

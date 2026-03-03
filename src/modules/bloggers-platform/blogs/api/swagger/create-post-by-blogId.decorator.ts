@@ -9,7 +9,7 @@ import {
   ApiUnauthorizedResponse,
   OmitType,
 } from '@nestjs/swagger';
-// import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
+import { SwaggerErrorsMessagesViewDto } from '../../../../../core/dto';
 import { SwaggerCreatePostInputDto } from '../../../posts/api/swagger';
 import { PostViewDto } from 'src/modules/bloggers-platform/posts/api/dto';
 
@@ -30,7 +30,7 @@ export const CreatePostByBlogIdApi = () => {
     }),
     ApiBadRequestResponse({
       description: 'If the inputModel has incorrect values',
-      // type: SwaggerErrorsMessagesViewDto,
+      type: SwaggerErrorsMessagesViewDto,
     }),
     ApiUnauthorizedResponse({
       description: 'Unauthorized',

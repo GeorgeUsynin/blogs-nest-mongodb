@@ -21,6 +21,26 @@ export class UsersRepository {
     return this.UserModel.findOne({ email });
   }
 
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+  }
+
+  async findUserByPasswordRecoveryCode(
+    code: string,
+  ): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ 'passwordRecovery.recoveryCode': code });
+  }
+
+  async findUserByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+  }
+
   async save(user: UserDocument): Promise<void> {
     await user.save();
   }

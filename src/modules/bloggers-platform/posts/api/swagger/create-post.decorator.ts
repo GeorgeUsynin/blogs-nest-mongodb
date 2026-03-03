@@ -7,7 +7,7 @@ import {
   ApiProperty,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-// import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
+import { SwaggerErrorsMessagesViewDto } from '../../../../../core/dto';
 import { CreatePostInputDto, PostViewDto } from '../dto';
 import {
   contentConstraints,
@@ -56,7 +56,7 @@ export const CreatePostApi = () => {
     }),
     ApiBadRequestResponse({
       description: 'If the inputModel has incorrect values',
-      // type: SwaggerErrorsMessagesViewDto,
+      type: SwaggerErrorsMessagesViewDto,
     }),
     ApiUnauthorizedResponse({
       description: 'Unauthorized',

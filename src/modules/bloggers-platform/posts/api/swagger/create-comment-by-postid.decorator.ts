@@ -9,7 +9,7 @@ import {
   ApiProperty,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-// import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
+import { SwaggerErrorsMessagesViewDto } from '../../../../../core/dto';
 import {
   CreateCommentInputDto,
   CommentViewDto,
@@ -42,7 +42,7 @@ export const CreateCommentByPostIdApi = () => {
     }),
     ApiBadRequestResponse({
       description: 'If the inputModel has incorrect values',
-      //   type: SwaggerErrorsMessagesViewDto,
+      type: SwaggerErrorsMessagesViewDto,
     }),
     ApiUnauthorizedResponse({
       description: 'Unauthorized',

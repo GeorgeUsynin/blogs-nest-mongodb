@@ -11,7 +11,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { contentConstraints } from '../../domain';
-// import { SwaggerErrorsMessagesViewDto } from '../../../../core/dto/swagger-errors-messages.view-dto';
+import { SwaggerErrorsMessagesViewDto } from '../../../../../core/dto';
 import { UpdateCommentInputDto } from '../dto';
 
 export class SwaggerUpdateCommentInputDto implements UpdateCommentInputDto {
@@ -39,7 +39,7 @@ export const UpdateCommentApi = () => {
     }),
     ApiBadRequestResponse({
       description: 'If the inputModel has incorrect values',
-      // type: SwaggerErrorsMessagesViewDto,
+      type: SwaggerErrorsMessagesViewDto,
     }),
     ApiUnauthorizedResponse({
       description: 'Unauthorized',

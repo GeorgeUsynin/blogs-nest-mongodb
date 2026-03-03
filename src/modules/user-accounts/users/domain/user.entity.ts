@@ -1,13 +1,18 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
-  HydratedDocument,
-  Model,
-  Query,
-  SchemaTimestampsConfig,
-} from 'mongoose';
+import { HydratedDocument, Model, Query } from 'mongoose';
+import { randomUUID } from 'node:crypto';
+import { add } from 'date-fns/add';
 import { CreateUserDomainDto } from './dto';
 import { emailConstraints, loginConstraints } from './user.entity-constraints';
-import { UserAlreadyDeleted } from '../../../../core/exceptions';
+import {
+  ConfirmationCodeExpired,
+  EmailAlreadyConfirmedByCode,
+  InvalidConfirmationCode,
+  InvalidPasswordRecoveryCode,
+  PasswordRecoveryCodeExpired,
+  UserAlreadyDeleted,
+} from '../../../../core/exceptions';
+import { SETTINGS } from './constants';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -23,6 +28,41 @@ export class User {
 
   @Prop({ type: Boolean, default: false })
   isDeleted: boolean;
+
+  @Prop({
+    type: {
+      isConfirmed: Boolean,
+      confirmationCode: String,
+      expirationDate: String,
+    },
+    default: {
+      isConfirmed: false,
+      confirmationCode: null,
+      expirationDate: null,
+    }, // Set default object
+    _id: false,
+  })
+  emailConfirmation: {
+    isConfirmed: boolean;
+    confirmationCode: string | null;
+    expirationDate: string | null;
+  };
+
+  @Prop({
+    type: {
+      recoveryCode: String,
+      expirationDate: String,
+    },
+    default: {
+      recoveryCode: null,
+      expirationDate: null,
+    }, // Set default object
+    _id: false,
+  })
+  passwordRecovery: {
+    recoveryCode: string | null;
+    expirationDate: string | null;
+  };
 
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
@@ -55,6 +95,68 @@ export class User {
     user.login = dto.login;
 
     return user as UserDocument;
+  }
+
+  createAndUpdatePasswordRecoveryCode() {
+    const recoveryCode = randomUUID();
+    const expirationDate = add(new Date(), {
+      hours: SETTINGS.RECOVERY_CODE_EXPIRATION_TIME_IN_HOURS,
+    }).toISOString();
+
+    this.passwordRecovery.recoveryCode = recoveryCode;
+    this.passwordRecovery.expirationDate = expirationDate;
+
+    return recoveryCode;
+  }
+
+  updatePasswordByRecoveryCode(code: string, passwordHash: string) {
+    if (this.passwordRecovery.recoveryCode !== code) {
+      throw new InvalidPasswordRecoveryCode();
+    }
+
+    if (Date.now() > Date.parse(this.passwordRecovery.expirationDate!)) {
+      throw new PasswordRecoveryCodeExpired();
+    }
+
+    this.passwordHash = passwordHash;
+  }
+
+  confirmUserEmail(code: string) {
+    if (this.emailConfirmation.isConfirmed) {
+      throw new EmailAlreadyConfirmedByCode();
+    }
+
+    if (this.emailConfirmation.confirmationCode !== code) {
+      throw new InvalidConfirmationCode();
+    }
+
+    if (Date.now() > Date.parse(this.emailConfirmation.expirationDate!)) {
+      throw new ConfirmationCodeExpired();
+    }
+
+    this.emailConfirmation.isConfirmed = true;
+  }
+
+  regenerateEmailConfirmationCode() {
+    if (this.emailConfirmation.isConfirmed) {
+      throw new EmailAlreadyConfirmedByCode();
+    }
+
+    const confirmationCode = this.createEmailConfirmationCode();
+
+    return confirmationCode;
+  }
+
+  createEmailConfirmationCode() {
+    const newConfirmationCode = randomUUID();
+    const newExpirationDate = add(new Date(), {
+      hours: SETTINGS.EMAIL_CONFIRMATION_CODE_EXPIRATION_TIME_IN_HOURS,
+    }).toISOString();
+
+    this.emailConfirmation.confirmationCode = newConfirmationCode;
+    this.emailConfirmation.expirationDate = newExpirationDate;
+
+    return newConfirmationCode;
   }
 
   makeDeleted() {

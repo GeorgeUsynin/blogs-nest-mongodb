@@ -1,17 +1,21 @@
-import { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BaseDomainException } from '../domainExceptions';
-import { ErrorCode, ErrorField } from '../constants';
 import { BadRequestHttpException } from '../httpExceptions';
-import { ErrorMessage } from '../httpExceptions';
+
+class TValidationError {
+  message?: string;
+  field?: string;
+  code?: string;
+}
+
+export type ErrorViewModel = TValidationError[];
 
 export type HttpResponseBody = {
   timestamp: string;
   path: string | null;
-  message?: string;
-  field?: ErrorField;
-  code?: ErrorCode;
-  errorsMessages?: ErrorMessage[];
+  status: number;
+  errorsMessages: ErrorViewModel;
 };
 
 export abstract class BaseExceptionFilter implements ExceptionFilter {
@@ -25,26 +29,24 @@ export abstract class BaseExceptionFilter implements ExceptionFilter {
     this.onCatch(exception, response, request);
   }
 
-  getDefaultHttpBody(url: string, exception: unknown): HttpResponseBody {
-    const isBaseDomainException = exception instanceof BaseDomainException;
-    const isBadRequestHttpException =
-      exception instanceof BadRequestHttpException;
+  createErrorMessages(errors: TValidationError[]): ErrorViewModel {
+    return errors.map((error) => ({
+      ...(error.message ? { message: error.message } : {}),
+      ...(error.field ? { field: error.field } : {}),
+      ...(error.code ? { code: error.code } : {}),
+    }));
+  }
 
+  getDefaultHttpBody(
+    url: string,
+    status: HttpStatus,
+    errorsMessages: ErrorViewModel,
+  ): HttpResponseBody {
     return {
       timestamp: new Date().toISOString(),
       path: url,
-      ...((exception as any).message
-        ? { message: (exception as any).message }
-        : {}),
-      ...(isBaseDomainException && exception.code
-        ? { code: exception.code }
-        : {}),
-      ...(isBaseDomainException && exception.field
-        ? { field: exception.field }
-        : {}),
-      ...(isBadRequestHttpException
-        ? { errorsMessages: exception.errorsMessages }
-        : {}),
+      status,
+      errorsMessages,
     };
   }
 }

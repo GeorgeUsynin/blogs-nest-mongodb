@@ -1,10 +1,14 @@
-export { UsersController } from './api';
+export { UsersController, AuthController } from './api';
 export { User, UserSchema } from './domain';
 import {
   UsersService,
   UsersExternalService,
   PasswordHasherService,
+  PasswordRecoveryService,
+  RegistrationService,
+  AuthService,
 } from './application';
+import { LocalStrategy } from './guards/local';
 import {
   UsersRepository,
   UsersQueryRepository,
@@ -17,5 +21,12 @@ export const usersProviders = [
   UsersRepository,
   UsersQueryRepository,
   UsersExternalQueryRepository,
+];
+
+export const authProviders = [
+  AuthService,
+  PasswordRecoveryService,
   PasswordHasherService,
+  RegistrationService,
+  LocalStrategy,
 ];

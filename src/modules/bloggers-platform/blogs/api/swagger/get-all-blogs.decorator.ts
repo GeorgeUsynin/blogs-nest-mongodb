@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
-import { ApiPaginatedResponse } from 'src/core/decorators';
+import { ApiPaginatedResponse } from '../../../../../core/decorators';
 import { BlogViewDto } from '../dto';
 
 export const GetAllBlogsApi = () => {
