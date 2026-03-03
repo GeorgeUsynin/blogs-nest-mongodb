@@ -23,6 +23,11 @@ import {
   GetAllUsersApi,
   GetUserApi,
 } from './swagger';
+import { ObjectIdValidationPipe } from '../../../../core/pipes';
+import {
+  UserCreationFailedError,
+  UserNotFoundError,
+} from '../../../../core/exceptions';
 
 @Controller('users')
 export class UsersController {
@@ -53,12 +58,13 @@ export class UsersController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @GetUserApi()
-  async getUserById(@Param('id') id: string): Promise<UserViewDto> {
+  async getUserById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<UserViewDto> {
     const foundUser = await this.usersQueryRepository.getUserById(id);
 
     if (!foundUser) {
-      // throw new UserNotFoundError();
-      throw new Error();
+      throw new UserNotFoundError();
     }
 
     return UserViewDto.mapToView(foundUser);
@@ -75,8 +81,7 @@ export class UsersController {
     const createdUser = await this.usersQueryRepository.getUserById(userId);
 
     if (!createdUser) {
-      // throw new UserCreationFailedError();
-      throw new Error();
+      throw new UserCreationFailedError();
     }
 
     return UserViewDto.mapToView(createdUser);
@@ -85,7 +90,9 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @DeleteUserApi()
-  async deleteUser(@Param('id') id: string): Promise<void> {
+  async deleteUser(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
     await this.usersService.deleteUser(id);
   }
 }

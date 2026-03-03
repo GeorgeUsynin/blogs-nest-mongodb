@@ -15,6 +15,12 @@ import { CommentsService } from '../../comments/application';
 import { PostsQueryRepository } from '../infrastructure';
 import { CommentsQueryRepository } from '../../comments/infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
+import { ObjectIdValidationPipe } from '../../../../core/pipes';
+import {
+  CommentCreationFailedError,
+  PostCreationFailedError,
+  PostNotFoundError,
+} from '../../../../core/exceptions';
 import {
   PostViewDto,
   CreatePostInputDto,
@@ -67,13 +73,10 @@ export class PostsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @GetPostApi()
-  async getPostById(@Param('id') id: string): Promise<PostViewDto> {
-    const foundPost = await this.postsQueryRepository.getPostById(id);
-
-    if (!foundPost) {
-      // throw new PostNotFoundError();
-      throw new Error();
-    }
+  async getPostById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<PostViewDto> {
+    const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
     return PostViewDto.mapToView(foundPost);
   }
@@ -82,14 +85,10 @@ export class PostsController {
   @HttpCode(HttpStatus.OK)
   @GetAllCommentsByPostIdApi()
   async getAllCommentsByPostId(
-    @Param('postId') postId: string,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
     @Query() query: GetCommentsQueryParamsInputDto,
   ) {
-    const foundPost = await this.postsQueryRepository.getPostById(postId);
-    if (!foundPost) {
-      // throw new PostNotFoundError();
-      throw new Error();
-    }
+    await this.findPostByIdOrThrowNotFound(postId);
 
     const { items, totalCount } =
       await this.commentsQueryRepository.getAllCommentsByPostId(
@@ -117,8 +116,7 @@ export class PostsController {
     const createdPost = await this.postsQueryRepository.getPostById(postId);
 
     if (!createdPost) {
-      // throw new PostCreationFailedError();
-      throw new Error();
+      throw new PostCreationFailedError();
     }
 
     return PostViewDto.mapToView(createdPost);
@@ -128,12 +126,12 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   @CreateCommentByPostIdApi()
   async createCommentByPostId(
-    @Param('postId') postId: string,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
     @Body() body: CreateCommentInputDto,
   ) {
     const commentId = await this.commentsService.createComment(
       postId,
-      '',
+      'userId',
       body,
     );
 
@@ -141,8 +139,7 @@ export class PostsController {
       await this.commentsQueryRepository.getCommentById(commentId);
 
     if (!createdComment) {
-      // throw new CommentCreationFailedError();
-      throw new Error();
+      throw new CommentCreationFailedError();
     }
 
     return CommentViewDto.mapToView(createdComment);
@@ -152,7 +149,7 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UpdatePostApi()
   async updatePostById(
-    @Param('id') id: string,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: UpdatePostInputDto,
   ): Promise<void> {
     await this.postsService.updateById({ ...body, id });
@@ -161,7 +158,15 @@ export class PostsController {
   @Delete(':id')
   @DeletePostApi()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') id: string): Promise<void> {
+  async deletePost(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
     await this.postsService.deletePost(id);
+  }
+
+  private async findPostByIdOrThrowNotFound(id: string) {
+    const post = await this.postsQueryRepository.getPostById(id);
+    if (!post) throw new PostNotFoundError();
+    return post;
   }
 }

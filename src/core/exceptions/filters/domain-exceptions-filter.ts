@@ -1,0 +1,44 @@
+import { Catch, HttpStatus } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { BaseExceptionFilter } from './base-exception-filter';
+import { BaseDomainException } from '../domainExceptions';
+import { ErrorCode, ErrorCodes } from '../constants';
+
+@Catch(BaseDomainException)
+export class DomainExceptionsFilter extends BaseExceptionFilter {
+  onCatch(
+    exception: BaseDomainException,
+    response: Response,
+    request: Request,
+  ): void {
+    response
+      .status(this.domainErrorToHttpStatus(exception.code))
+      .json(this.getDefaultHttpBody(request.url, exception));
+  }
+
+  domainErrorToHttpStatus(code: ErrorCode) {
+    switch (code) {
+      case ErrorCodes.LOGIN_ALREADY_EXISTS:
+      case ErrorCodes.EMAIL_ALREADY_EXISTS:
+      case ErrorCodes.INVALID_CONFIRMATION_CODE:
+      case ErrorCodes.INVALID_PASSWORD_RECOVERY_CODE:
+      case ErrorCodes.CONFIRMATION_CODE_EXPIRED:
+      case ErrorCodes.PASSWORD_RECOVERY_CODE_EXPIRED:
+      case ErrorCodes.PASSWORD_RECOVERY_CODE_EXPIRED:
+        return HttpStatus.BAD_REQUEST;
+      case ErrorCodes.USER_NOT_FOUND:
+      case ErrorCodes.BLOG_NOT_FOUND:
+      case ErrorCodes.POST_NOT_FOUND:
+      case ErrorCodes.COMMENT_NOT_FOUND:
+      case ErrorCodes.DEVICE_NOT_FOUND:
+        return HttpStatus.NOT_FOUND;
+      case ErrorCodes.NOT_AN_OWNER_OF_THIS_DEVICE:
+      case ErrorCodes.NOT_AN_OWNER_OF_THIS_COMMENT:
+        return HttpStatus.FORBIDDEN;
+      case ErrorCodes.USER_CREATION_FAILED:
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+      default:
+        return HttpStatus.BAD_REQUEST;
+    }
+  }
+}

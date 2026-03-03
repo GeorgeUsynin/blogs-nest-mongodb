@@ -4,6 +4,10 @@ import { CommentsRepository } from '../infrastructure';
 import { CreateCommentDto, UpdateCommentDto } from './dto';
 import { Comment, type CommentModelType } from '../domain';
 import { PostsRepository } from '../../posts/infrastructure';
+import {
+  CommentNotFoundError,
+  PostNotFoundError,
+} from '../../../../core/exceptions';
 
 @Injectable()
 export class CommentsService {
@@ -21,8 +25,7 @@ export class CommentsService {
   ): Promise<string> {
     const foundPost = await this.postsRepository.findById(postId);
     if (!foundPost) {
-      // throw new PostNotFoundError();
-      throw new Error();
+      throw new PostNotFoundError();
     }
 
     // const user = await this.usersRepository.findById(userId);
@@ -45,11 +48,7 @@ export class CommentsService {
   }
 
   async updateById(userId: string, dto: UpdateCommentDto): Promise<void> {
-    const foundComment = await this.commentsRepository.findById(dto.id);
-    if (!foundComment) {
-      // throw new CommentNotFoundError();
-      throw new Error();
-    }
+    const foundComment = await this.findCommentByIdOrThrowNotFound(dto.id);
 
     // foundComment.ensureCommentOwner(userId);
     foundComment.updateContent(dto.content);
@@ -58,16 +57,17 @@ export class CommentsService {
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {
-    const foundComment = await this.commentsRepository.findById(id);
-
-    if (!foundComment) {
-      // throw new CommentNotFoundError();
-      throw new Error();
-    }
+    const foundComment = await this.findCommentByIdOrThrowNotFound(id);
 
     // foundComment.ensureCommentOwner(userId);
     foundComment.makeDeleted();
 
     await this.commentsRepository.save(foundComment);
+  }
+
+  private async findCommentByIdOrThrowNotFound(id: string) {
+    const comment = await this.commentsRepository.findById(id);
+    if (!comment) throw new CommentNotFoundError();
+    return comment;
   }
 }

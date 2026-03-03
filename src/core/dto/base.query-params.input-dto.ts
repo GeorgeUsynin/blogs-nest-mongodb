@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsPositive } from 'class-validator';
 
 enum SortDirection {
   Asc = 'asc',
@@ -13,6 +14,8 @@ export class BaseQueryParamsInputDto {
     default: 1,
   })
   @Type(() => Number)
+  @IsPositive()
+  @IsInt()
   pageNumber: number = 1;
 
   @ApiProperty({
@@ -21,6 +24,8 @@ export class BaseQueryParamsInputDto {
     default: 10,
   })
   @Type(() => Number)
+  @IsPositive()
+  @IsInt()
   pageSize: number = 10;
 
   @ApiProperty({
@@ -28,6 +33,7 @@ export class BaseQueryParamsInputDto {
     required: false,
     default: SortDirection.Desc,
   })
+  @IsEnum(SortDirection)
   sortDirection: SortDirection = SortDirection.Desc;
 
   calculateSkip() {

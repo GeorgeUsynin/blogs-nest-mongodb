@@ -5,6 +5,11 @@ import { PasswordHasherService } from './password-hasher.service';
 import { CreateUserDto } from './dto';
 import { User, UserDocument, type UserModelType } from '../domain';
 import { CreateUserDomainDto } from '../domain/dto';
+import {
+  EmailAlreadyExistsError,
+  LoginAlreadyExistsError,
+  UserNotFoundError,
+} from '../../../../core/exceptions';
 
 type TOptions = {
   shouldBeConfirmed: boolean;
@@ -27,15 +32,15 @@ export class UsersService {
 
     const userWithExistedLogin =
       await this.usersRepository.findUserByLogin(login);
-    // if (userWithExistedLogin) {
-    //   throw new LoginAlreadyExistsError();
-    // }
+    if (userWithExistedLogin) {
+      throw new LoginAlreadyExistsError();
+    }
 
     const userWithExistedEmail =
       await this.usersRepository.findUserByEmail(email);
-    // if (userWithExistedEmail) {
-    //   throw new EmailAlreadyExistsError();
-    // }
+    if (userWithExistedEmail) {
+      throw new EmailAlreadyExistsError();
+    }
 
     const passwordHash =
       await this.passwordHasherService.hashPassword(password);
@@ -62,8 +67,7 @@ export class UsersService {
     const foundUser = await this.usersRepository.findById(id);
 
     if (!foundUser) {
-      // throw new UserNotFoundError();
-      throw new Error();
+      throw new UserNotFoundError();
     }
 
     foundUser.makeDeleted();

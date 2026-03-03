@@ -5,6 +5,10 @@ import { CreatePostDto, UpdatePostDto } from './dto';
 import { Post, type PostModelType } from '../domain';
 import { UpdatePostDomainDto } from '../domain/dto';
 import { BlogsRepository } from '../../blogs/infrastructure';
+import {
+  BlogNotFoundError,
+  PostNotFoundError,
+} from '../../../../core/exceptions';
 
 @Injectable()
 export class PostsService {
@@ -16,12 +20,7 @@ export class PostsService {
   ) {}
 
   async createPost(dto: CreatePostDto): Promise<string> {
-    const blog = await this.blogsRepository.findById(dto.blogId);
-
-    if (!blog) {
-      // throw new BlogNotFoundError();
-      throw new Error();
-    }
+    const blog = await this.findBlogByIdOrThrowNotFound(dto.blogId);
 
     const newPost = this.PostModel.createPost({ ...dto, blogName: blog.name });
 
@@ -31,12 +30,9 @@ export class PostsService {
   }
 
   async updateById(dto: UpdatePostDto) {
-    const foundPost = await this.postsRepository.findById(dto.id);
+    await this.findBlogByIdOrThrowNotFound(dto.blogId);
 
-    if (!foundPost) {
-      // throw new PostNotFoundError()
-      throw new Error();
-    }
+    const foundPost = await this.findPostByIdOrThrowNotFound(dto.id);
 
     const updatePostDomainDto: UpdatePostDomainDto = {
       title: dto.title,
@@ -51,15 +47,22 @@ export class PostsService {
   }
 
   async deletePost(id: string): Promise<void> {
-    const foundPost = await this.postsRepository.findById(id);
-
-    if (!foundPost) {
-      // throw new PostNotFoundError();
-      throw new Error();
-    }
+    const foundPost = await this.findPostByIdOrThrowNotFound(id);
 
     foundPost.makeDeleted();
 
     await this.postsRepository.save(foundPost);
+  }
+
+  private async findBlogByIdOrThrowNotFound(id: string) {
+    const blog = await this.blogsRepository.findById(id);
+    if (!blog) throw new BlogNotFoundError();
+    return blog;
+  }
+
+  private async findPostByIdOrThrowNotFound(id: string) {
+    const post = await this.postsRepository.findById(id);
+    if (!post) throw new PostNotFoundError();
+    return post;
   }
 }

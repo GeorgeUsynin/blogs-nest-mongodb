@@ -7,6 +7,7 @@ import {
   titleConstraints,
 } from './post.entity-constraints';
 import { Likeable } from '../../shared/domain/';
+import { PostAlreadyDeleted } from '../../../../core/exceptions';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -58,8 +59,7 @@ export class Post extends Likeable {
 
   makeDeleted() {
     if (this.isDeleted) {
-      // TODO: improve error
-      throw new Error('Entity already deleted');
+      throw new PostAlreadyDeleted();
     }
 
     this.isDeleted = true;

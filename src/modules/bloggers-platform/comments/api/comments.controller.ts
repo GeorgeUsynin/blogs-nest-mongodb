@@ -12,6 +12,8 @@ import { CommentsService } from '../application';
 import { CommentsQueryRepository } from '../infrastructure';
 import { CommentViewDto, UpdateCommentInputDto } from './dto';
 import { DeleteCommentApi, GetCommentApi, UpdateCommentApi } from './swagger';
+import { CommentNotFoundError } from '../../../../core/exceptions';
+import { ObjectIdValidationPipe } from '../../../../core/pipes';
 
 @Controller('comments')
 export class CommentsController {
@@ -23,12 +25,13 @@ export class CommentsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @GetCommentApi()
-  async getCommentById(@Param('id') id: string): Promise<CommentViewDto> {
+  async getCommentById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<CommentViewDto> {
     const foundComment = await this.commentsQueryRepository.getCommentById(id);
 
     if (!foundComment) {
-      // throw new CommentNotFoundError();
-      throw new Error();
+      throw new CommentNotFoundError();
     }
 
     return CommentViewDto.mapToView(foundComment);
@@ -38,7 +41,7 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UpdateCommentApi()
   async updateCommentById(
-    @Param('id') id: string,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: UpdateCommentInputDto,
   ): Promise<void> {
     await this.commentsService.updateById('', { ...body, id });
@@ -47,7 +50,9 @@ export class CommentsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @DeleteCommentApi()
-  async deleteComment(@Param('id') id: string): Promise<void> {
+  async deleteComment(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
     await this.commentsService.deleteComment(id, '');
   }
 }

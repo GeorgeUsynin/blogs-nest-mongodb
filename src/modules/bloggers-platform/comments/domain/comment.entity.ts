@@ -3,6 +3,7 @@ import { HydratedDocument, Model, Query } from 'mongoose';
 import { CreateCommentDomainDto } from './dto';
 import { contentConstraints } from './comment.entity-constraints';
 import { Likeable } from '../../shared/domain';
+import { CommentAlreadyDeleted } from '../../../../core/exceptions';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -52,8 +53,7 @@ export class Comment extends Likeable {
 
   makeDeleted() {
     if (this.isDeleted) {
-      // TODO: improve error
-      throw new Error('Entity already deleted');
+      throw new CommentAlreadyDeleted();
     }
 
     this.isDeleted = true;

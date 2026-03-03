@@ -7,6 +7,7 @@ import {
 } from 'mongoose';
 import { CreateUserDomainDto } from './dto';
 import { emailConstraints, loginConstraints } from './user.entity-constraints';
+import { UserAlreadyDeleted } from '../../../../core/exceptions';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -58,8 +59,7 @@ export class User {
 
   makeDeleted() {
     if (this.isDeleted) {
-      // TODO: improve error
-      throw new Error('Entity has already been deleted');
+      throw new UserAlreadyDeleted();
     }
 
     this.isDeleted = true;

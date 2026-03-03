@@ -16,6 +16,12 @@ import { BlogsQueryRepository } from '../infrastructure';
 import { PostsQueryRepository } from '../../posts/infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
 import {
+  BlogCreationFailedError,
+  BlogNotFoundError,
+  PostCreationFailedError,
+} from '../../../../core/exceptions/domainExceptions';
+import { ObjectIdValidationPipe } from '../../../../core/pipes';
+import {
   BlogViewDto,
   CreateBlogInputDto,
   CreatePostWithoutBlogIdInputDto,
@@ -64,13 +70,10 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @GetBlogApi()
-  async getBlogById(@Param('id') id: string): Promise<BlogViewDto> {
-    const foundBlog = await this.blogsQueryRepository.getBlogById(id);
-
-    if (!foundBlog) {
-      // throw new BlogNotFoundError();
-      throw new Error();
-    }
+  async getBlogById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<BlogViewDto> {
+    const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
     return BlogViewDto.mapToView(foundBlog);
   }
@@ -79,15 +82,10 @@ export class BlogsController {
   @HttpCode(HttpStatus.OK)
   @GetAllPostsByBlogIdApi()
   async getPostsByBlogId(
-    @Param('blogId') blogId: string,
+    @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Query() query: GetPostsQueryParamsInputDto,
   ) {
-    const blog = await this.blogsQueryRepository.getBlogById(blogId);
-
-    if (!blog) {
-      // throw new BlogNotFoundError();
-      throw new Error();
-    }
+    await this.findBlogByIdOrThrowNotFound(blogId);
 
     const { items, totalCount } =
       await this.postsQueryRepository.getAllPostsByBlogId(blogId, query);
@@ -111,8 +109,7 @@ export class BlogsController {
     const createdBlog = await this.blogsQueryRepository.getBlogById(blogId);
 
     if (!createdBlog) {
-      // throw new BlogCreationFailedError();
-      throw new Error();
+      throw new BlogCreationFailedError();
     }
 
     return BlogViewDto.mapToView(createdBlog);
@@ -122,7 +119,7 @@ export class BlogsController {
   @HttpCode(HttpStatus.CREATED)
   @CreatePostByBlogIdApi()
   async createPostForBlogByBlogId(
-    @Param('blogId') blogId: string,
+    @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Body() body: CreatePostWithoutBlogIdInputDto,
   ) {
     const postId = await this.postsService.createPost({ ...body, blogId });
@@ -130,8 +127,7 @@ export class BlogsController {
     const createdPost = await this.postsQueryRepository.getPostById(postId);
 
     if (!createdPost) {
-      // throw new PostCreationFailedError();
-      throw new Error();
+      throw new PostCreationFailedError();
     }
 
     return PostViewDto.mapToView(createdPost);
@@ -141,7 +137,7 @@ export class BlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UpdateBlogApi()
   async updateBlogById(
-    @Param('id') id: string,
+    @Param('id', ObjectIdValidationPipe) id: string,
     @Body() body: UpdateBlogInputDto,
   ): Promise<void> {
     await this.blogsService.updateById({ ...body, id });
@@ -150,7 +146,15 @@ export class BlogsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @DeleteBlogApi()
-  async deleteBlog(@Param('id') id: string): Promise<void> {
+  async deleteBlog(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<void> {
     await this.blogsService.deleteBlog(id);
+  }
+
+  private async findBlogByIdOrThrowNotFound(id: string) {
+    const blog = await this.blogsQueryRepository.getBlogById(id);
+    if (!blog) throw new BlogNotFoundError();
+    return blog;
   }
 }

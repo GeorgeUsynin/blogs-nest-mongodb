@@ -6,6 +6,7 @@ import {
   nameConstraints,
   websiteUrlConstraints,
 } from './blog.entity-constraints';
+import { BlogAlreadyDeleted } from '../../../../core/exceptions';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -52,8 +53,7 @@ export class Blog {
 
   makeDeleted() {
     if (this.isDeleted) {
-      // TODO: improve error
-      throw new Error('Entity already deleted');
+      throw new BlogAlreadyDeleted();
     }
 
     this.isDeleted = true;

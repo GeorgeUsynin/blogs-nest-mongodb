@@ -4,6 +4,7 @@ import { BlogsRepository } from '../infrastructure';
 import { CreateBlogDto, UpdateBlogDto } from './dto';
 import { Blog, type BlogModelType } from '../domain';
 import { UpdateBlogDomainDto } from '../domain/dto';
+import { BlogNotFoundError } from '../../../../core/exceptions';
 
 @Injectable()
 export class BlogsService {
@@ -22,12 +23,7 @@ export class BlogsService {
   }
 
   async updateById(dto: UpdateBlogDto) {
-    const foundBlog = await this.blogsRepository.findById(dto.id);
-
-    if (!foundBlog) {
-      // throw new BlogNotFoundError()
-      throw new Error();
-    }
+    const foundBlog = await this.findBlogByIdOrThrowNotFound(dto.id);
 
     const updateBlogDomainDto: UpdateBlogDomainDto = {
       name: dto.name,
@@ -41,15 +37,16 @@ export class BlogsService {
   }
 
   async deleteBlog(id: string): Promise<void> {
-    const foundBlog = await this.blogsRepository.findById(id);
-
-    if (!foundBlog) {
-      // throw new BlogNotFoundError();
-      throw new Error();
-    }
+    const foundBlog = await this.findBlogByIdOrThrowNotFound(id);
 
     foundBlog.makeDeleted();
 
     await this.blogsRepository.save(foundBlog);
+  }
+
+  private async findBlogByIdOrThrowNotFound(id: string) {
+    const blog = await this.blogsRepository.findById(id);
+    if (!blog) throw new BlogNotFoundError();
+    return blog;
   }
 }
