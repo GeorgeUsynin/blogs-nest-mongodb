@@ -8,6 +8,7 @@ import {
   RegistrationService,
   AuthService,
 } from './application';
+import { JwtHeaderStrategy } from './guards/bearer';
 import { LocalStrategy } from './guards/local';
 import {
   UsersRepository,
@@ -29,4 +30,5 @@ export const authProviders = [
   PasswordHasherService,
   RegistrationService,
   LocalStrategy,
+  JwtHeaderStrategy,
 ];

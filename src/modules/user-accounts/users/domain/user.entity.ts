@@ -37,15 +37,17 @@ export class User {
     },
     default: {
       isConfirmed: false,
-      confirmationCode: null,
-      expirationDate: null,
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        hours: SETTINGS.EMAIL_CONFIRMATION_CODE_EXPIRATION_TIME_IN_HOURS,
+      }).toISOString(),
     }, // Set default object
     _id: false,
   })
   emailConfirmation: {
     isConfirmed: boolean;
-    confirmationCode: string | null;
-    expirationDate: string | null;
+    confirmationCode: string;
+    expirationDate: string;
   };
 
   @Prop({

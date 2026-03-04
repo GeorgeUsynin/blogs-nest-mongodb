@@ -21,5 +21,6 @@ const mongooseModels = [
   imports: [MongooseModule.forFeature(mongooseModels)],
   controllers: [...controllers],
   providers: [...providers],
+  exports: [MongooseModule],
 })
 export class BloggersPlatformModule {}

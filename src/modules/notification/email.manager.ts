@@ -6,7 +6,7 @@ export class EmailManager {
   constructor(private emailAdapter: EmailAdapter) {}
 
   sendConfirmationEmail(email: string, code: string) {
-    const subject = 'Password Confirmation';
+    const subject = 'Email Confirmation';
     const message = `<h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
         <a href='https://some-front.com/confirm-email?code=${code}'>complete registration</a>

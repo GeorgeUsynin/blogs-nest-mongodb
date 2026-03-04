@@ -35,5 +35,6 @@ import { NotificationsModule } from '../notification';
     ...usersProviders,
     ...authProviders,
   ],
+  exports: [MongooseModule],
 })
 export class UserAccountsModule {}

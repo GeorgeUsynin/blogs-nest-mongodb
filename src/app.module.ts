@@ -4,6 +4,7 @@ import {
   BloggersPlatformModule,
   UserAccountsModule,
   NotificationsModule,
+  TestingModule,
 } from './modules';
 
 @Module({
@@ -15,6 +16,7 @@ import {
     BloggersPlatformModule,
     UserAccountsModule,
     NotificationsModule,
+    TestingModule,
   ],
 })
 export class AppModule {}
