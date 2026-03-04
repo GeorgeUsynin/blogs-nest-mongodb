@@ -37,17 +37,15 @@ export class User {
     },
     default: {
       isConfirmed: false,
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), {
-        hours: SETTINGS.EMAIL_CONFIRMATION_CODE_EXPIRATION_TIME_IN_HOURS,
-      }).toISOString(),
+      confirmationCode: null,
+      expirationDate: null,
     }, // Set default object
     _id: false,
   })
   emailConfirmation: {
     isConfirmed: boolean;
-    confirmationCode: string;
-    expirationDate: string;
+    confirmationCode: string | null;
+    expirationDate: string | null;
   };
 
   @Prop({
@@ -83,6 +81,7 @@ export class User {
     user.email = dto.email;
     user.passwordHash = dto.passwordHash;
     user.login = dto.login;
+    user.emailConfirmation.isConfirmed = true;
 
     return user as UserDocument;
   }
@@ -95,6 +94,7 @@ export class User {
     user.email = dto.email;
     user.passwordHash = dto.passwordHash;
     user.login = dto.login;
+    user.createEmailConfirmationCode();
 
     return user as UserDocument;
   }

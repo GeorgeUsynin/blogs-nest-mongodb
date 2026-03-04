@@ -8,6 +8,7 @@ import {
   RegistrationService,
   AuthService,
 } from './application';
+import { CreateUserUseCase } from './application/use-cases';
 import { JwtHeaderStrategy } from './guards/bearer';
 import { LocalStrategy } from './guards/local';
 import {
@@ -32,3 +33,5 @@ export const authProviders = [
   LocalStrategy,
   JwtHeaderStrategy,
 ];
+
+export const useCases = [CreateUserUseCase];

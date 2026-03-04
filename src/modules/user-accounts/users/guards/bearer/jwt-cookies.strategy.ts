@@ -6,9 +6,9 @@ import { UnauthorizedHttpException } from '../../../../../core/exceptions';
 import { UsersRepository } from '../../infrastructure';
 
 @Injectable()
-export class JwtHeaderStrategy extends PassportStrategy(
+export class JwtCookiesStrategy extends PassportStrategy(
   Strategy,
-  'jwt-header',
+  'jwt-cookies',
 ) {
   constructor(
     // protected userAccountConfig: UserAccountsConfig,
@@ -17,8 +17,8 @@ export class JwtHeaderStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      // secretOrKey: userAccountConfig.JWT_ACCESS_SECRET,
-      secretOrKey: process.env.JWT_ACCESS_SECRET!,
+      // secretOrKey: userAccountConfig.JWT_REFRESH_SECRET,
+      secretOrKey: process.env.JWT_REFRESH_SECRET!,
     });
   }
 

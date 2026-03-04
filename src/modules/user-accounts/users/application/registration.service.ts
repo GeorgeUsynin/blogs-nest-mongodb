@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure';
 import { EmailManager } from '../../../notification';
-import { UsersService } from './users.service';
 import {
   InvalidConfirmationCode,
   UserCreationFailedError,
 } from '../../../../core/exceptions';
 import { CreateUserDto } from './dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './use-cases';
 
 @Injectable()
 export class RegistrationService {
   constructor(
-    private usersService: UsersService,
+    private commandBus: CommandBus,
     private usersRepository: UsersRepository,
     private emailManager: EmailManager,
   ) {}
 
   async registerNewUser(dto: CreateUserDto): Promise<void> {
-    const userId = await this.usersService.createUser(dto);
+    const userId = await this.commandBus.execute(new CreateUserCommand(dto));
 
     const createdUser = await this.usersRepository.findById(userId);
 

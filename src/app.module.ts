@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CqrsModule } from '@nestjs/cqrs';
 import {
   BloggersPlatformModule,
   UserAccountsModule,
@@ -13,6 +14,7 @@ import {
     MongooseModule.forRoot(process.env.MONGO_URL!, {
       dbName: 'nest-bloggers-platform-mongodb',
     }),
+    CqrsModule.forRoot(),
     BloggersPlatformModule,
     UserAccountsModule,
     NotificationsModule,

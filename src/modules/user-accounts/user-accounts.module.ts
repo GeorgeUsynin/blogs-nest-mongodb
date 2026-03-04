@@ -4,12 +4,16 @@ import { JwtService } from '@nestjs/jwt';
 import {
   AuthController,
   authProviders,
+  useCases,
   User,
   UserSchema,
   UsersController,
   usersProviders,
 } from './users';
-import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from './users/application/constants';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from './users/application/constants';
 import { NotificationsModule } from '../notification';
 
 @Module({
@@ -24,7 +28,7 @@ import { NotificationsModule } from '../notification';
       // useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
       useFactory: (): JwtService => {
         return new JwtService({
-          secret: process.env.JWT_SECRET,
+          secret: process.env.JWT_ACCESS_SECRET,
           signOptions: {
             expiresIn: '5m',
           },
@@ -32,8 +36,22 @@ import { NotificationsModule } from '../notification';
       },
       // inject: [UserAccountsConfig],
     },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      // useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
+      useFactory: (): JwtService => {
+        return new JwtService({
+          secret: process.env.JWT_REFRESH_SECRET,
+          signOptions: {
+            expiresIn: '10weeks',
+          },
+        });
+      },
+      // inject: [UserAccountsConfig],
+    },
     ...usersProviders,
     ...authProviders,
+    ...useCases,
   ],
   exports: [MongooseModule],
 })
