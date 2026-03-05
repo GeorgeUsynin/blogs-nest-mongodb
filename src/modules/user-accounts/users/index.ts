@@ -1,14 +1,20 @@
 export { UsersController, AuthController } from './api';
 export { User, UserSchema } from './domain';
 import {
-  UsersService,
   UsersExternalService,
   PasswordHasherService,
-  PasswordRecoveryService,
-  RegistrationService,
   AuthService,
 } from './application';
-import { CreateUserUseCase } from './application/use-cases';
+import {
+  ConfirmRegistrationUseCase,
+  CreateUserUseCase,
+  DeleteUserUseCase,
+  LoginUserUseCase,
+  NewPasswordUseCase,
+  RecoverPasswordUseCase,
+  RegisterUserUseCase,
+  ResendEmailConfirmationUseCase,
+} from './application/use-cases';
 import { JwtHeaderStrategy } from './guards/bearer';
 import { LocalStrategy } from './guards/local';
 import {
@@ -18,7 +24,6 @@ import {
 } from './infrastructure';
 
 export const usersProviders = [
-  UsersService,
   UsersExternalService,
   UsersRepository,
   UsersQueryRepository,
@@ -27,11 +32,18 @@ export const usersProviders = [
 
 export const authProviders = [
   AuthService,
-  PasswordRecoveryService,
   PasswordHasherService,
-  RegistrationService,
   LocalStrategy,
   JwtHeaderStrategy,
 ];
 
-export const useCases = [CreateUserUseCase];
+export const useCases = [
+  LoginUserUseCase,
+  RegisterUserUseCase,
+  CreateUserUseCase,
+  DeleteUserUseCase,
+  RecoverPasswordUseCase,
+  ConfirmRegistrationUseCase,
+  NewPasswordUseCase,
+  ResendEmailConfirmationUseCase,
+];

@@ -3,6 +3,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailAdapter } from './email.adapter';
 import { EmailManager } from './email.manager';
 import { EMAIL_SERVICE } from './constants';
+import {
+  EmailConfirmationRequestedHandler,
+  PasswordRecoveryRequestedHandler,
+} from './event-handlers';
 
 @Module({
   imports: [
@@ -24,7 +28,12 @@ import { EMAIL_SERVICE } from './constants';
       // inject: [CoreConfig],
     }),
   ],
-  providers: [EmailAdapter, EmailManager],
+  providers: [
+    EmailAdapter,
+    EmailManager,
+    EmailConfirmationRequestedHandler,
+    PasswordRecoveryRequestedHandler,
+  ],
   exports: [EmailManager],
 })
 export class NotificationsModule {}

@@ -54,6 +54,7 @@ export class CreateUserUseCase implements ICommandHandler<
       await this.passwordHasherService.hashPassword(password);
 
     let newUser: UserDocument | null = null;
+
     const createUserDomainDto: CreateUserDomainDto = {
       email,
       login,

@@ -23,6 +23,7 @@ export const ErrorCodes = {
   COMMENT_CREATION_FAILED: 'COMMENT_CREATION_FAILED',
   USER_CREATION_FAILED: 'USER_CREATION_FAILED',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  EMAIL_NOT_CONFIRMED: 'EMAIL_NOT_CONFIRMED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -53,6 +54,7 @@ export const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCodes.COMMENT_CREATION_FAILED]: 'Comment creation failed',
   [ErrorCodes.USER_CREATION_FAILED]: 'User creation failed',
   [ErrorCodes.INVALID_CREDENTIALS]: 'Invalid credentials',
+  [ErrorCodes.EMAIL_NOT_CONFIRMED]: 'Email address is not confirmed',
 };
 
 export const ErrorFields = {

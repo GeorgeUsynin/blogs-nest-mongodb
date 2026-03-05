@@ -7,14 +7,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { ExtractUserFromRequest } from '../guards/decorators';
 import { UserContextDto } from '../guards/dto';
 import { LocalAuthGuard } from '../guards/local';
-import {
-  AuthService,
-  PasswordRecoveryService,
-  RegistrationService,
-} from '../application';
 import {
   LoginApi,
   MeApi,
@@ -37,14 +33,20 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtHeaderAuthGuard } from '../guards/bearer';
 import { UsersQueryRepository } from '../infrastructure';
 import { UserNotFoundError } from '../../../../core/exceptions';
+import {
+  ConfirmRegistrationCommand,
+  LoginUserCommand,
+  NewPasswordCommand,
+  RecoverPasswordCommand,
+  RegisterUserCommand,
+  ResendEmailConfirmationCommand,
+} from '../application/use-cases';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService,
-    private registrationService: RegistrationService,
-    private passwordRecoveryService: PasswordRecoveryService,
     private usersQueryRepository: UsersQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @ApiBearerAuth()
@@ -69,9 +71,7 @@ export class AuthController {
   async login(
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<LoginSuccessViewDto> {
-    const access_token = await this.authService.login(user.userId);
-
-    return access_token;
+    return this.commandBus.execute(new LoginUserCommand(user.userId));
   }
 
   @Post('password-recovery')
@@ -82,7 +82,7 @@ export class AuthController {
   ): Promise<void> {
     const { email } = body;
 
-    await this.passwordRecoveryService.recoverPassword(email);
+    await this.commandBus.execute(new RecoverPasswordCommand(email));
   }
 
   @Post('new-password')
@@ -91,9 +91,8 @@ export class AuthController {
   async newPassword(@Body() body: NewPasswordInputDto): Promise<void> {
     const { newPassword, recoveryCode } = body;
 
-    await this.passwordRecoveryService.updateNewPassword(
-      newPassword,
-      recoveryCode,
+    await this.commandBus.execute(
+      new NewPasswordCommand(newPassword, recoveryCode),
     );
   }
 
@@ -105,14 +104,14 @@ export class AuthController {
   ): Promise<void> {
     const { code } = body;
 
-    await this.registrationService.confirmRegistration(code);
+    await this.commandBus.execute(new ConfirmRegistrationCommand(code));
   }
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   @RegistrationApi()
   async registration(@Body() body: CreateUserInputDto): Promise<void> {
-    await this.registrationService.registerNewUser(body);
+    await this.commandBus.execute(new RegisterUserCommand(body));
   }
 
   @Post('registration-email-resending')
@@ -123,6 +122,6 @@ export class AuthController {
   ): Promise<void> {
     const { email } = body;
 
-    await this.registrationService.resendEmailConfirmationCode(email);
+    await this.commandBus.execute(new ResendEmailConfirmationCommand(email));
   }
 }

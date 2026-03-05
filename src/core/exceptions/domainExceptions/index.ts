@@ -22,6 +22,7 @@ import { BlogAlreadyDeleted } from './BlogAlreadyDeleted';
 import { PostAlreadyDeleted } from './PostAlreadyDeleted';
 import { CommentAlreadyDeleted } from './CommentAlreadyDeleted';
 import { UserAlreadyDeleted } from './UserAlreadyDeleted';
+import { EmailNotConfirmedError } from './EmailNotConfirmed';
 
 export {
   BaseDomainException,
@@ -48,4 +49,5 @@ export {
   PostAlreadyDeleted,
   CommentAlreadyDeleted,
   UserAlreadyDeleted,
+  EmailNotConfirmedError,
 };
