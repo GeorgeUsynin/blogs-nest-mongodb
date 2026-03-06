@@ -1,7 +1,5 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { BaseDomainException } from '../domainExceptions';
-import { BadRequestHttpException } from '../httpExceptions';
 
 class TValidationError {
   message?: string;

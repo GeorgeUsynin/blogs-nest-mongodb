@@ -1,7 +1,5 @@
 import { ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../../infrastructure';
-import { UpdateBlogDto } from '../dto';
-import { UpdateBlogDomainDto } from '../../domain/dto';
 import { BlogNotFoundError } from '../../../../../core/exceptions';
 
 export class DeleteBlogCommand {

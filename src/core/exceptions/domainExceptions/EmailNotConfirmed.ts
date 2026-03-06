@@ -1,4 +1,4 @@
-import { ErrorCodes, ErrorFields } from '../constants';
+import { ErrorCodes } from '../constants';
 import { BaseDomainException } from './BaseDomainException';
 
 export class EmailNotConfirmedError extends BaseDomainException {
