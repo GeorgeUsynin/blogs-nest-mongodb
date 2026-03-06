@@ -17,10 +17,12 @@ import {
   UsersRepository,
   UsersQueryRepository,
   UsersExternalQueryRepository,
+  UsersExternalRepository,
 } from './infrastructure';
 
 export const usersProviders = [
   UsersRepository,
+  UsersExternalRepository,
   UsersQueryRepository,
   UsersExternalQueryRepository,
 ];

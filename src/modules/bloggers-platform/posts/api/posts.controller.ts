@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
-import { CommentsService } from '../../comments/application';
 import { PostsQueryRepository } from '../infrastructure';
 import { CommentsQueryRepository } from '../../comments/infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
@@ -61,11 +60,11 @@ import {
 } from '../../../user-accounts/users/guards/decorators';
 import { UserContextDto } from '../../../user-accounts/users/guards/dto';
 import { CreateUpdateLikeStatusInputDto } from '../../likes/api/dto';
+import { CreateCommentCommand } from '../../comments/application/use-cases';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
     private commandBus: CommandBus,
@@ -165,10 +164,8 @@ export class PostsController {
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContextDto,
   ) {
-    const commentId = await this.commentsService.createComment(
-      postId,
-      user.userId,
-      body,
+    const commentId = await this.commandBus.execute(
+      new CreateCommentCommand(postId, user.userId, body),
     );
 
     const createdComment =

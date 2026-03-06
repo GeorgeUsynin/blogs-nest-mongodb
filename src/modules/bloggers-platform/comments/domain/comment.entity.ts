@@ -3,7 +3,10 @@ import { HydratedDocument, Model, Query } from 'mongoose';
 import { CreateCommentDomainDto } from './dto';
 import { contentConstraints } from './comment.entity-constraints';
 import { Likeable } from '../../shared/domain';
-import { CommentAlreadyDeleted } from '../../../../core/exceptions';
+import {
+  CommentAlreadyDeleted,
+  NotAnOwnerOfThisComment,
+} from '../../../../core/exceptions';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -60,8 +63,21 @@ export class Comment extends Likeable {
     this.deletedAt = new Date();
   }
 
+  ensureCommentOwner(userId: string) {
+    if (this.commentatorInfo.userId !== userId) {
+      throw new NotAnOwnerOfThisComment();
+    }
+
+    return true;
+  }
+
   updateContent(content: string) {
     this.content = content;
+  }
+
+  updateLikesCounts(likesCount: number, dislikesCount: number) {
+    this.likesInfo.likesCount = likesCount;
+    this.likesInfo.dislikesCount = dislikesCount;
   }
 }
 

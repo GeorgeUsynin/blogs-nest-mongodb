@@ -15,7 +15,10 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from './users/application/constants';
 import { NotificationsModule } from '../notification';
-import { UsersExternalQueryRepository } from './users/infrastructure';
+import {
+  UsersExternalQueryRepository,
+  UsersExternalRepository,
+} from './users/infrastructure';
 
 @Module({
   imports: [
@@ -54,6 +57,10 @@ import { UsersExternalQueryRepository } from './users/infrastructure';
     ...authProviders,
     ...useCases,
   ],
-  exports: [MongooseModule, UsersExternalQueryRepository],
+  exports: [
+    MongooseModule,
+    UsersExternalRepository,
+    UsersExternalQueryRepository,
+  ],
 })
 export class UserAccountsModule {}
