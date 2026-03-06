@@ -34,7 +34,7 @@ import {
         return new JwtService({
           secret: process.env.JWT_ACCESS_SECRET,
           signOptions: {
-            expiresIn: '5m',
+            expiresIn: '1week',
           },
         });
       },

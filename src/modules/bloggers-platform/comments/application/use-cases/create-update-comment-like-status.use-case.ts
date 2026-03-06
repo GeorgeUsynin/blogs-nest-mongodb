@@ -27,7 +27,7 @@ export class CreateUpdateCommentLikeStatusUseCase implements ICommandHandler<Cre
     await this.likesService.setLikeStatus({
       authorId: userId,
       parentId: commentId,
-      parentType: ParentType.Post,
+      parentType: ParentType.Comment,
       likeStatus,
     });
 
