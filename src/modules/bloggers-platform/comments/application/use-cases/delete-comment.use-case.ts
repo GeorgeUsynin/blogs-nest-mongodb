@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentNotFoundError } from '../../../../../core/exceptions';
 import { CommentsRepository } from '../../infrastructure';
 
@@ -9,6 +9,7 @@ export class DeleteCommentCommand {
   ) {}
 }
 
+@CommandHandler(DeleteCommentCommand)
 export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentCommand> {
   constructor(private commentsRepository: CommentsRepository) {}
 

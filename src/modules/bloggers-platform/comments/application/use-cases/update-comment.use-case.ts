@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentNotFoundError } from '../../../../../core/exceptions';
 import { UpdateCommentDto } from '../dto';
 import { CommentsRepository } from '../../infrastructure';
@@ -10,6 +10,7 @@ export class UpdateCommentCommand {
   ) {}
 }
 
+@CommandHandler(UpdateCommentCommand)
 export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentCommand> {
   constructor(private commentsRepository: CommentsRepository) {}
 

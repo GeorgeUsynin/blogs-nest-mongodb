@@ -1,4 +1,4 @@
-import { Command, ICommandHandler } from '@nestjs/cqrs';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, type BlogModelType } from '../../domain';
 import { BlogsRepository } from '../../infrastructure';
@@ -10,6 +10,7 @@ export class CreateBlogCommand extends Command<string> {
   }
 }
 
+@CommandHandler(CreateBlogCommand)
 export class CreateBlogUseCase implements ICommandHandler<
   CreateBlogCommand,
   string

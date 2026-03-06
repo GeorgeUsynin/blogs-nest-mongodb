@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdatePostDto } from '../dto';
 import {
   BlogNotFoundError,
@@ -12,6 +12,7 @@ export class UpdatePostCommand {
   constructor(public readonly dto: UpdatePostDto) {}
 }
 
+@CommandHandler(UpdatePostCommand)
 export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
   constructor(
     private blogsRepository: BlogsRepository,

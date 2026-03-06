@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostNotFoundError } from '../../../../../core/exceptions';
 import { PostsRepository } from '../../infrastructure';
 import { CreateUpdatePostLikeStatusDto } from '../dto';
@@ -9,6 +9,7 @@ export class CreateUpdatePostLikeStatusCommand {
   constructor(public readonly dto: CreateUpdatePostLikeStatusDto) {}
 }
 
+@CommandHandler(CreateUpdatePostLikeStatusCommand)
 export class CreateUpdatePostLikeStatusUseCase implements ICommandHandler<CreateUpdatePostLikeStatusCommand> {
   constructor(
     private likesService: LikesService,

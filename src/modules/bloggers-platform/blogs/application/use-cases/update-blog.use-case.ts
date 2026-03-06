@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../../infrastructure';
 import { UpdateBlogDto } from '../dto';
 import { UpdateBlogDomainDto } from '../../domain/dto';
@@ -8,6 +8,7 @@ export class UpdateBlogCommand {
   constructor(public readonly dto: UpdateBlogDto) {}
 }
 
+@CommandHandler(UpdateBlogCommand)
 export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(private blogsRepository: BlogsRepository) {}
 

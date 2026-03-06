@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentNotFoundError } from '../../../../../core/exceptions';
 import { CommentsRepository } from '../../infrastructure';
 import { CreateUpdateCommentLikeStatusDto } from '../dto';
@@ -9,6 +9,7 @@ export class CreateUpdateCommentLikeStatusCommand {
   constructor(public readonly dto: CreateUpdateCommentLikeStatusDto) {}
 }
 
+@CommandHandler(CreateUpdateCommentLikeStatusCommand)
 export class CreateUpdateCommentLikeStatusUseCase implements ICommandHandler<CreateUpdateCommentLikeStatusCommand> {
   constructor(
     private likesService: LikesService,

@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostNotFoundError } from '../../../../../core/exceptions';
 import { PostsRepository } from '../../infrastructure';
 
@@ -6,6 +6,7 @@ export class DeletePostCommand {
   constructor(public readonly id: string) {}
 }
 
+@CommandHandler(DeletePostCommand)
 export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
   constructor(private postsRepository: PostsRepository) {}
 
