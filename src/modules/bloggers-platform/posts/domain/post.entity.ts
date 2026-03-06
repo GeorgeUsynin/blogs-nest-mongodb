@@ -66,6 +66,11 @@ export class Post extends Likeable {
     this.deletedAt = new Date();
   }
 
+  updateLikesCounts(likesCount: number, dislikesCount: number) {
+    this.likesInfo.likesCount = likesCount;
+    this.likesInfo.dislikesCount = dislikesCount;
+  }
+
   updatePost(dto: UpdatePostDomainDto) {
     this.title = dto.title;
     this.shortDescription = dto.shortDescription;

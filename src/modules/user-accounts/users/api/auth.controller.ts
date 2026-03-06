@@ -5,9 +5,11 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { type Response } from 'express';
 import { ExtractUserFromRequest } from '../guards/decorators';
 import { UserContextDto } from '../guards/dto';
 import { LocalAuthGuard } from '../guards/local';
@@ -69,9 +71,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @LoginApi()
   async login(
+    @Res({ passthrough: true }) response: Response,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<LoginSuccessViewDto> {
-    return this.commandBus.execute(new LoginUserCommand(user.userId));
+    const access_token = await this.commandBus.execute(
+      new LoginUserCommand(user.userId),
+    );
+
+    response.cookie('refreshToken', 'value', {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return access_token;
   }
 
   @Post('password-recovery')

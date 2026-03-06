@@ -1,7 +1,7 @@
 import { LikeStatus } from '../../../../likes/domain';
 import { Post } from '../../../domain';
 
-type TNewestLikes = {
+export type TNewestLike = {
   createdAt: Date;
   authorId: string;
   authorLogin: string;
@@ -9,5 +9,5 @@ type TNewestLikes = {
 
 export type PostReadDto = OnlyProperties<WithId<Post>> & {
   myStatus: LikeStatus;
-  newestLikes: TNewestLikes[];
+  newestLikes: TNewestLike[];
 };

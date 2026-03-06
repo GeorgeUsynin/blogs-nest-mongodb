@@ -8,3 +8,4 @@ export {
 export { CreateCommentByPostIdApi } from './create-comment-by-postid.decorator';
 export { UpdatePostApi } from './update-post.decorator';
 export { DeletePostApi } from './delete-post.decorator';
+export { UpdatePostLikeStatusApi } from './update-post-like-status.decorator';

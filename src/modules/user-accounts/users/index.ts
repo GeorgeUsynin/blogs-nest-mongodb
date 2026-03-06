@@ -1,10 +1,6 @@
 export { UsersController, AuthController } from './api';
 export { User, UserSchema } from './domain';
-import {
-  UsersExternalService,
-  PasswordHasherService,
-  AuthService,
-} from './application';
+import { PasswordHasherService, AuthService } from './application';
 import {
   ConfirmRegistrationUseCase,
   CreateUserUseCase,
@@ -24,7 +20,6 @@ import {
 } from './infrastructure';
 
 export const usersProviders = [
-  UsersExternalService,
   UsersRepository,
   UsersQueryRepository,
   UsersExternalQueryRepository,

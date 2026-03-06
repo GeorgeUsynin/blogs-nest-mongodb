@@ -1,1 +1,1 @@
-export { type PostReadDto } from './post.read-dto';
+export * from './post.read-dto';

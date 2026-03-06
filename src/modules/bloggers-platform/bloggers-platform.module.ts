@@ -8,17 +8,25 @@ import {
   CommentsController,
   commentsProviders,
 } from './comments';
+import { Like, LikeSchema, likesProviders } from './likes';
+import { UserAccountsModule } from '../user-accounts';
 
 const controllers = [BlogsController, PostsController, CommentsController];
-const providers = [...blogsProviders, ...postsProviders, ...commentsProviders];
+const providers = [
+  ...blogsProviders,
+  ...postsProviders,
+  ...commentsProviders,
+  ...likesProviders,
+];
 const mongooseModels = [
   { name: Blog.name, schema: BlogSchema },
   { name: Post.name, schema: PostSchema },
   { name: Comment.name, schema: CommentSchema },
+  { name: Like.name, schema: LikeSchema },
 ];
 
 @Module({
-  imports: [MongooseModule.forFeature(mongooseModels)],
+  imports: [MongooseModule.forFeature(mongooseModels), UserAccountsModule],
   controllers: [...controllers],
   providers: [...providers],
   exports: [MongooseModule],

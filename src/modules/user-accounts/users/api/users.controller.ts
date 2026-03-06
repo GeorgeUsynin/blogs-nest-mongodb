@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { ApiBasicAuth } from '@nestjs/swagger';
 import { UsersQueryRepository } from '../infrastructure';
 import { PaginatedViewDto } from '../../../../core/dto';
 import {
@@ -42,6 +43,7 @@ export class UsersController {
   ) {}
 
   @Get()
+  @ApiBasicAuth()
   @HttpCode(HttpStatus.OK)
   @GetAllUsersApi()
   async getAllUsers(
@@ -77,6 +79,7 @@ export class UsersController {
   }
 
   @Post()
+  @ApiBasicAuth()
   @HttpCode(HttpStatus.CREATED)
   @CreateUserApi()
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
@@ -94,6 +97,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiBasicAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @DeleteUserApi()
   async deleteUser(
