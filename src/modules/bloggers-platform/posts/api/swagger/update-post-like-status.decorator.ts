@@ -26,7 +26,7 @@ export const UpdatePostLikeStatusApi = () => {
     ApiOperation({
       summary: 'Make like/unlike/dislike/undislike operation',
     }),
-    ApiParam({ name: 'id', type: String, description: 'Post id' }),
+    ApiParam({ name: 'postId', type: String, description: 'Post id' }),
     ApiBody({
       type: SwaggerUpdatePostLikeStatusInputDto,
       description: 'Like model for make like/dislike/reset operation',
