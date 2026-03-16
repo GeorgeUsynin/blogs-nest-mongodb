@@ -2,30 +2,30 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailAdapter } from './email.adapter';
 import { EmailManager } from './email.manager';
-import { EMAIL_SERVICE } from './constants';
 import {
   EmailConfirmationRequestedHandler,
   PasswordRecoveryRequestedHandler,
 } from './event-handlers';
+import { NotificationConfig, NotificationConfigModule } from './config';
 
 @Module({
   imports: [
     // Using forRootAsync for proper environment variables loading
     MailerModule.forRootAsync({
-      // useFactory: async (coreConfig: CoreConfig) => ({
-      useFactory: async () => ({
+      imports: [NotificationConfigModule],
+      useFactory: async (notificationConfig: NotificationConfig) => ({
         transport: {
-          service: EMAIL_SERVICE,
+          service: notificationConfig.EMAIL_SERVICE,
           auth: {
-            user: process.env.EMAIL_BLOG_PLATFORM,
-            pass: process.env.EMAIL_BLOG_PLATFORM_PASSWORD,
+            user: notificationConfig.EMAIL_BLOG_PLATFORM,
+            pass: notificationConfig.EMAIL_BLOG_PLATFORM_PASSWORD,
           },
         },
         defaults: {
-          from: `Blog Platform <${process.env.EMAIL_BLOG_PLATFORM}>`,
+          from: `Blog Platform <${notificationConfig.EMAIL_BLOG_PLATFORM}>`,
         },
       }),
-      // inject: [CoreConfig],
+      inject: [NotificationConfig],
     }),
   ],
   providers: [

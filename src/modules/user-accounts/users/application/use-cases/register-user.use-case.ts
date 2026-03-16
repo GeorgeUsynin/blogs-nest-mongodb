@@ -9,6 +9,7 @@ import { UsersRepository } from '../../infrastructure';
 import { UserCreationFailedError } from '../../../../../core/exceptions';
 import { EmailConfirmationRequestedEvent } from '../events';
 import { CreateUserCommand } from './create-user.use-case';
+import { UserAccountsConfig } from '../../config';
 
 export class RegisterUserCommand {
   constructor(public readonly dto: CreateUserDto) {}
@@ -19,12 +20,16 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
   constructor(
     private usersRepository: UsersRepository,
     private commandBus: CommandBus,
+    private userAccountsConfig: UserAccountsConfig,
     private eventBus: EventBus,
   ) {}
 
   async execute({ dto }: RegisterUserCommand): Promise<void> {
     const createdUserId = await this.commandBus.execute(
-      new CreateUserCommand(dto),
+      new CreateUserCommand(dto, {
+        shouldBeConfirmed:
+          this.userAccountsConfig.IS_USER_AUTOMATICALLY_CONFIRMED,
+      }),
     );
 
     const createdUser = await this.usersRepository.findById(createdUserId);
@@ -33,11 +38,13 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
       throw new UserCreationFailedError();
     }
 
-    this.eventBus.publish(
-      new EmailConfirmationRequestedEvent(
-        createdUser.email,
-        createdUser.emailConfirmation.confirmationCode!,
-      ),
-    );
+    if (!this.userAccountsConfig.IS_USER_AUTOMATICALLY_CONFIRMED) {
+      this.eventBus.publish(
+        new EmailConfirmationRequestedEvent(
+          createdUser.email,
+          createdUser.emailConfirmation.confirmationCode!,
+        ),
+      );
+    }
   }
 }

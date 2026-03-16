@@ -19,6 +19,7 @@ import {
   UsersExternalQueryRepository,
   UsersExternalRepository,
 } from './users/infrastructure';
+import { UserAccountsConfig } from './users/config';
 
 @Module({
   imports: [
@@ -29,29 +30,27 @@ import {
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      // useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
-      useFactory: (): JwtService => {
+      useFactory: (userAccountsConfig: UserAccountsConfig): JwtService => {
         return new JwtService({
           secret: process.env.JWT_ACCESS_SECRET,
           signOptions: {
-            expiresIn: '1week',
+            expiresIn: userAccountsConfig.ACCESS_TOKEN_EXPIRATION_TIME,
           },
         });
       },
-      // inject: [UserAccountsConfig],
+      inject: [UserAccountsConfig],
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      // useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
-      useFactory: (): JwtService => {
+      useFactory: (userAccountsConfig: UserAccountsConfig): JwtService => {
         return new JwtService({
           secret: process.env.JWT_REFRESH_SECRET,
           signOptions: {
-            expiresIn: '10weeks',
+            expiresIn: userAccountsConfig.REFRESH_TOKEN_EXPIRATION_TIME,
           },
         });
       },
-      // inject: [UserAccountsConfig],
+      inject: [UserAccountsConfig],
     },
     ...usersProviders,
     ...authProviders,

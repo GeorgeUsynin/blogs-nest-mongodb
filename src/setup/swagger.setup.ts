@@ -1,8 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { GLOBAL_PREFIX } from './global-prefix.setup';
+import { CoreConfig } from '../core/config';
+import { GLOBAL_PREFIX } from '../constants';
 
-export function swaggerSetup(app: INestApplication) {
+export function swaggerSetup(app: INestApplication, coreConfig: CoreConfig) {
+  if (!coreConfig.IS_SWAGGER_ENABLED) return;
+
   const config = new DocumentBuilder()
     .setTitle('BLOGGER API')
     .setDescription('Blogs API documentation')

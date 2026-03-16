@@ -11,6 +11,7 @@ import {
   RegisterUserUseCase,
   ResendEmailConfirmationUseCase,
 } from './application/use-cases';
+import { UserAccountsConfig } from './config';
 import { JwtHeaderStrategy } from './guards/bearer';
 import { LocalStrategy } from './guards/local';
 import {
@@ -25,6 +26,7 @@ export const usersProviders = [
   UsersExternalRepository,
   UsersQueryRepository,
   UsersExternalQueryRepository,
+  UserAccountsConfig,
 ];
 
 export const authProviders = [

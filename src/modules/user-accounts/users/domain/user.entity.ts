@@ -12,7 +12,6 @@ import {
   PasswordRecoveryCodeExpired,
   UserAlreadyDeleted,
 } from '../../../../core/exceptions';
-import { SETTINGS } from './constants';
 
 // The timestamp flag automatically adds the updatedAt and createdAt fields
 @Schema({ timestamps: true })
@@ -86,7 +85,10 @@ export class User {
     return user as UserDocument;
   }
 
-  static createUnconfirmedUser(dto: CreateUserDomainDto): UserDocument {
+  static createUnconfirmedUser(
+    dto: CreateUserDomainDto,
+    expireInHours: number,
+  ): UserDocument {
     // user -> UserDocument
     // this -> UserModel
     const user = new this();
@@ -94,15 +96,15 @@ export class User {
     user.email = dto.email;
     user.passwordHash = dto.passwordHash;
     user.login = dto.login;
-    user.createEmailConfirmationCode();
+    user.createEmailConfirmationCode(expireInHours);
 
     return user as UserDocument;
   }
 
-  createAndUpdatePasswordRecoveryCode() {
+  createAndUpdatePasswordRecoveryCode(expireInHours: number) {
     const recoveryCode = randomUUID();
     const expirationDate = add(new Date(), {
-      hours: SETTINGS.RECOVERY_CODE_EXPIRATION_TIME_IN_HOURS,
+      hours: expireInHours,
     }).toISOString();
 
     this.passwordRecovery.recoveryCode = recoveryCode;
@@ -139,20 +141,20 @@ export class User {
     this.emailConfirmation.isConfirmed = true;
   }
 
-  regenerateEmailConfirmationCode() {
+  regenerateEmailConfirmationCode(expireInHours: number) {
     if (this.emailConfirmation.isConfirmed) {
       throw new EmailAlreadyConfirmedByCode();
     }
 
-    const confirmationCode = this.createEmailConfirmationCode();
+    const confirmationCode = this.createEmailConfirmationCode(expireInHours);
 
     return confirmationCode;
   }
 
-  createEmailConfirmationCode() {
+  createEmailConfirmationCode(expireInHours: number) {
     const newConfirmationCode = randomUUID();
     const newExpirationDate = add(new Date(), {
-      hours: SETTINGS.EMAIL_CONFIRMATION_CODE_EXPIRATION_TIME_IN_HOURS,
+      hours: expireInHours,
     }).toISOString();
 
     this.emailConfirmation.confirmationCode = newConfirmationCode;
