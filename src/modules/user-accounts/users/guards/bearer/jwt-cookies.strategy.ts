@@ -1,3 +1,4 @@
+import { type Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -15,7 +16,9 @@ export class JwtCookiesStrategy extends PassportStrategy(
     private devicesRepository: DevicesRepository,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        JwtCookiesStrategy.cookieExtractor,
+      ]),
       ignoreExpiration: false,
       secretOrKey: userAccountsConfig.JWT_REFRESH_SECRET,
     });
@@ -41,5 +44,13 @@ export class JwtCookiesStrategy extends PassportStrategy(
     }
 
     return { userId: payload.userId, deviceId: payload.deviceId };
+  }
+
+  private static cookieExtractor(req: Request) {
+    let token = null;
+    if (req && req.cookies) {
+      token = req.cookies['refreshToken'];
+    }
+    return token;
   }
 }

@@ -14,7 +14,7 @@ import {
   UpdateTokensUseCase,
 } from './application/use-cases';
 import { UserAccountsConfig } from './config';
-import { JwtHeaderStrategy } from './guards/bearer';
+import { JwtCookiesStrategy, JwtHeaderStrategy } from './guards/bearer';
 import { LocalStrategy } from './guards/local';
 import {
   UsersRepository,
@@ -36,6 +36,7 @@ export const authProviders = [
   PasswordHasherService,
   LocalStrategy,
   JwtHeaderStrategy,
+  JwtCookiesStrategy,
 ];
 
 export const usersUseCases = [

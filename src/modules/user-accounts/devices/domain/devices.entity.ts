@@ -1,8 +1,9 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateDeviceDomainDto } from './dto';
 import { NotAnOwnerOfThisDevice } from '../../../../core/exceptions';
 
+@Schema()
 export class Device {
   @Prop({ type: String, required: true })
   userId: string;

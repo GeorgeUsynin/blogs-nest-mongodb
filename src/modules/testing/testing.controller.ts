@@ -3,6 +3,8 @@ import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { User, type UserModelType } from '../user-accounts/users/domain';
 import { Blog, type BlogModelType } from '../bloggers-platform/blogs/domain';
 import { Post, type PostModelType } from '../bloggers-platform/posts/domain';
+import { Like, type LikeModelType } from '../bloggers-platform/likes/domain';
+import { Device, type DeviceModelType } from '../user-accounts/devices/domain';
 import {
   Comment,
   type CommentModelType,
@@ -21,8 +23,10 @@ export class TestingController {
     private PostModel: PostModelType,
     @InjectModel(Comment.name)
     private CommentModel: CommentModelType,
-    // @InjectModel(AuthDeviceSession.name)
-    // private AuthDeviceSessionModel: AuthDeviceSessionModelType,
+    @InjectModel(Like.name)
+    private LikeModel: LikeModelType,
+    @InjectModel(Device.name)
+    private DeviceModel: DeviceModelType,
   ) {}
 
   @Delete('all-data')
@@ -32,7 +36,8 @@ export class TestingController {
     await this.UserModel.deleteMany();
     await this.BlogModel.deleteMany();
     await this.PostModel.deleteMany();
+    await this.LikeModel.deleteMany();
     await this.CommentModel.deleteMany();
-    // await this.AuthDeviceSessionModel.deleteMany();
+    await this.DeviceModel.deleteMany();
   }
 }

@@ -14,7 +14,7 @@ export const TerminateAuthDeviceSessionByIdApi = () => {
       summary: 'Terminate specified device session',
     }),
     ApiParam({
-      name: 'id',
+      name: 'deviceId',
       type: String,
       description: 'Id of session that will be terminated',
     }),

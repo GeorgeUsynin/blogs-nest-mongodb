@@ -90,7 +90,7 @@ export class AuthController {
       new LoginUserCommand({ userId: user.userId, deviceName, clientIp }),
     );
 
-    response.cookie(refreshToken, 'value', {
+    response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
     });
@@ -120,7 +120,7 @@ export class AuthController {
       new UpdateTokensCommand(user.deviceId, user.userId),
     );
 
-    response.cookie(refreshToken, 'value', {
+    response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
     });

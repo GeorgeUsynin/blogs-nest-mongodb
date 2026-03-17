@@ -50,7 +50,7 @@ export class LoginUserUseCase implements ICommandHandler<
     const issuedAt = new Date(iat! * 1000).toISOString();
     const expiresIn = new Date(exp! * 1000).toISOString();
 
-    const createdDevice = this.DeviceModel.createDevice({
+    const newDevice = this.DeviceModel.createDevice({
       userId,
       deviceId: uniqueDeviceId,
       clientIp,
@@ -59,7 +59,7 @@ export class LoginUserUseCase implements ICommandHandler<
       expiresIn,
     });
 
-    await this.devicesRepository.save(createdDevice);
+    await this.devicesRepository.save(newDevice);
 
     return { accessToken, refreshToken };
   }

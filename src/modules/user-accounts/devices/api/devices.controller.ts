@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -23,9 +24,9 @@ import {
   TerminateDeviceByDeviceIdCommand,
 } from '../application/use-cases';
 
+@Controller('security/devices')
 @ApiBearerAuth()
 @UseGuards(JwtCookiesAuthGuard)
-@Controller('security/devices')
 export class DevicesController {
   constructor(
     private devicesQueryRepository: DevicesQueryRepository,
@@ -56,14 +57,15 @@ export class DevicesController {
     );
   }
 
-  @Delete()
+  @Delete(':deviceId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @TerminateAuthDeviceSessionByIdApi()
   async deleteDeviceById(
+    @Param('deviceId') deviceId: string,
     @ExtractUserFromRequest() user: UserContextWithDeviceIdDto,
   ): Promise<void> {
     await this.commandBus.execute(
-      new TerminateDeviceByDeviceIdCommand(user.deviceId, user.userId),
+      new TerminateDeviceByDeviceIdCommand(deviceId, user.userId),
     );
   }
 }
