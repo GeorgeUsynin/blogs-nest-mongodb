@@ -1,4 +1,5 @@
 import { OmitType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 import { UserViewDto } from './user.view-dto';
 import { UserDocument } from '../../../domain';
 
@@ -6,6 +7,7 @@ export class MeViewDto extends OmitType(UserViewDto, [
   'createdAt',
   'id',
 ] as const) {
+  @ApiProperty()
   userId: string;
 
   static mapToView(user: UserDocument): MeViewDto {

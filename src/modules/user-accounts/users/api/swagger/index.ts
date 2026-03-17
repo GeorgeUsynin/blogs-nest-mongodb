@@ -9,3 +9,5 @@ export { RegistrationConfirmationApi } from './registration-confirmation.decorat
 export { RegistrationApi } from './registration.decorator';
 export { RegistrationEmailResendingApi } from './registration-email-resending.decorator';
 export { MeApi } from './me.decorator';
+export { LogoutApi } from './logout.decorator';
+export { RefreshTokenApi } from './refresh-token.decorator';

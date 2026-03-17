@@ -6,10 +6,12 @@ import {
   CreateUserUseCase,
   DeleteUserUseCase,
   LoginUserUseCase,
+  LogoutUserUseCase,
   NewPasswordUseCase,
   RecoverPasswordUseCase,
   RegisterUserUseCase,
   ResendEmailConfirmationUseCase,
+  UpdateTokensUseCase,
 } from './application/use-cases';
 import { UserAccountsConfig } from './config';
 import { JwtHeaderStrategy } from './guards/bearer';
@@ -36,7 +38,7 @@ export const authProviders = [
   JwtHeaderStrategy,
 ];
 
-export const useCases = [
+export const usersUseCases = [
   LoginUserUseCase,
   RegisterUserUseCase,
   CreateUserUseCase,
@@ -45,4 +47,6 @@ export const useCases = [
   ConfirmRegistrationUseCase,
   NewPasswordUseCase,
   ResendEmailConfirmationUseCase,
+  LogoutUserUseCase,
+  UpdateTokensUseCase,
 ];

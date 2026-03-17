@@ -1,9 +1,9 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
-import { JwtHeaderPayloadDto, UserContextDto } from '../dto';
-import { UnauthorizedHttpException } from '../../../../../core/exceptions';
-import { UsersRepository } from '../../infrastructure';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtCookiesPayloadDto, UserContextWithDeviceIdDto } from '../dto';
+import { UserAccountsConfig } from '../../config';
+import { DevicesRepository } from '../../../devices/infrastructure';
 
 @Injectable()
 export class JwtCookiesStrategy extends PassportStrategy(
@@ -11,27 +11,35 @@ export class JwtCookiesStrategy extends PassportStrategy(
   'jwt-cookies',
 ) {
   constructor(
-    // protected userAccountConfig: UserAccountsConfig,
-    private usersRepository: UsersRepository,
+    protected userAccountsConfig: UserAccountsConfig,
+    private devicesRepository: DevicesRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      // secretOrKey: userAccountConfig.JWT_REFRESH_SECRET,
-      secretOrKey: process.env.JWT_REFRESH_SECRET!,
+      secretOrKey: userAccountsConfig.JWT_REFRESH_SECRET,
     });
   }
 
-  async validate(payload: JwtHeaderPayloadDto): Promise<UserContextDto> {
-    // Checking if user exists
-    const isUserExists = Boolean(
-      await this.usersRepository.findById(payload.userId),
-    );
+  async validate(
+    payload: JwtCookiesPayloadDto,
+  ): Promise<UserContextWithDeviceIdDto> {
+    const { deviceId, userId, iat } = payload;
 
-    if (!isUserExists) {
-      throw new UnauthorizedHttpException();
+    const device = await this.devicesRepository.findByDeviceId(deviceId);
+
+    if (!device) {
+      throw new UnauthorizedException();
     }
 
-    return { userId: payload.userId };
+    if (!device.isDeviceOwner(userId)) {
+      throw new UnauthorizedException();
+    }
+
+    if (!device.isIssuedAtMatch(new Date(iat * 1000).toISOString())) {
+      throw new UnauthorizedException();
+    }
+
+    return { userId: payload.userId, deviceId: payload.deviceId };
   }
 }

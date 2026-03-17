@@ -1,10 +1,20 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../constants';
+import { randomUUID } from 'node:crypto';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from '../constants';
+import { LoginUserDto } from '../dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Device, type DeviceModelType } from '../../../devices/domain';
+import { DevicesRepository } from '../../../devices/infrastructure';
 
-export class LoginUserCommand extends Command<{ accessToken: string }> {
-  constructor(public readonly userId: string) {
+type TLoginCommandOutput = { accessToken: string; refreshToken: string };
+
+export class LoginUserCommand extends Command<TLoginCommandOutput> {
+  constructor(public readonly dto: LoginUserDto) {
     super();
   }
 }
@@ -12,20 +22,45 @@ export class LoginUserCommand extends Command<{ accessToken: string }> {
 @CommandHandler(LoginUserCommand)
 export class LoginUserUseCase implements ICommandHandler<
   LoginUserCommand,
-  { accessToken: string }
+  TLoginCommandOutput
 > {
   constructor(
     @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
     private accessTokenContext: JwtService,
+    @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
+    private refreshTokenContext: JwtService,
+    @InjectModel(Device.name)
+    private DeviceModel: DeviceModelType,
+    private devicesRepository: DevicesRepository,
   ) {}
 
-  async execute({
-    userId,
-  }: LoginUserCommand): Promise<{ accessToken: string }> {
-    const payload = { userId };
+  async execute({ dto }: LoginUserCommand): Promise<TLoginCommandOutput> {
+    const { userId, clientIp, deviceName } = dto;
 
-    const accessToken = this.accessTokenContext.sign(payload);
+    // creating access token
+    const accessTokenPayload = { userId };
+    const accessToken = this.accessTokenContext.sign(accessTokenPayload);
 
-    return { accessToken };
+    // creating refresh token
+    const uniqueDeviceId = randomUUID();
+    const refreshTokenPayload = { userId, deviceId: uniqueDeviceId };
+    const refreshToken = this.refreshTokenContext.sign(refreshTokenPayload);
+
+    const { iat, exp } = this.refreshTokenContext.decode(refreshToken);
+    const issuedAt = new Date(iat! * 1000).toISOString();
+    const expiresIn = new Date(exp! * 1000).toISOString();
+
+    const createdDevice = this.DeviceModel.createDevice({
+      userId,
+      deviceId: uniqueDeviceId,
+      clientIp,
+      deviceName,
+      issuedAt,
+      expiresIn,
+    });
+
+    await this.devicesRepository.save(createdDevice);
+
+    return { accessToken, refreshToken };
   }
 }

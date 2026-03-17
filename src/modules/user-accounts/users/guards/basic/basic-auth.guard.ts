@@ -3,13 +3,13 @@ import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { UnauthorizedHttpException } from '../../../../../core/exceptions';
-// import { UserAccountsConfig } from '../../config';
+import { UserAccountsConfig } from '../../config';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    // private userAccountConfig: UserAccountsConfig,
+    private userAccountsConfig: UserAccountsConfig,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,8 +35,8 @@ export class BasicAuthGuard implements CanActivate {
     const [login, password] = credentials.split(':');
 
     if (
-      login === process.env.ADMIN_USERNAME &&
-      password === process.env.ADMIN_PASSWORD
+      login === this.userAccountsConfig.ADMIN_USERNAME &&
+      password === this.userAccountsConfig.ADMIN_PASSWORD
     ) {
       return true;
     } else {

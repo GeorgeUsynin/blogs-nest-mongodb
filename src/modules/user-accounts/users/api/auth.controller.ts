@@ -4,20 +4,24 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Ip,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { type Response } from 'express';
+import { type Response, type Request } from 'express';
 import { ExtractUserFromRequest } from '../guards/decorators';
-import { UserContextDto } from '../guards/dto';
+import { UserContextDto, UserContextWithDeviceIdDto } from '../guards/dto';
 import { LocalAuthGuard } from '../guards/local';
 import {
   LoginApi,
+  LogoutApi,
   MeApi,
   NewPasswordApi,
   PasswordRecoveryApi,
+  RefreshTokenApi,
   RegistrationApi,
   RegistrationConfirmationApi,
   RegistrationEmailResendingApi,
@@ -28,21 +32,25 @@ import {
   MeViewDto,
   NewPasswordInputDto,
   PasswordRecoveryInputDto,
+  RefreshTokenViewDto,
   RegistrationConfirmationInputDto,
   RegistrationEmailResendingInputDto,
 } from './dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtHeaderAuthGuard } from '../guards/bearer';
+import { JwtCookiesAuthGuard, JwtHeaderAuthGuard } from '../guards/bearer';
 import { UsersQueryRepository } from '../infrastructure';
 import { UserNotFoundError } from '../../../../core/exceptions';
 import {
   ConfirmRegistrationCommand,
   LoginUserCommand,
+  LogoutUserCommand,
   NewPasswordCommand,
   RecoverPasswordCommand,
   RegisterUserCommand,
   ResendEmailConfirmationCommand,
+  UpdateTokensCommand,
 } from '../application/use-cases';
+import { parseUserAgent } from './helpers';
 
 @Controller('auth')
 export class AuthController {
@@ -71,19 +79,53 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @LoginApi()
   async login(
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
     @ExtractUserFromRequest() user: UserContextDto,
+    @Ip() clientIp: string,
   ): Promise<LoginSuccessViewDto> {
-    const access_token = await this.commandBus.execute(
-      new LoginUserCommand(user.userId),
+    const deviceName = parseUserAgent(request.headers['user-agent']);
+
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new LoginUserCommand({ userId: user.userId, deviceName, clientIp }),
     );
 
-    response.cookie('refreshToken', 'value', {
+    response.cookie(refreshToken, 'value', {
       httpOnly: true,
       secure: true,
     });
 
-    return access_token;
+    return { accessToken };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtCookiesAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @LogoutApi()
+  async logout(@ExtractUserFromRequest() user: UserContextWithDeviceIdDto) {
+    await this.commandBus.execute(new LogoutUserCommand(user.deviceId));
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtCookiesAuthGuard)
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @RefreshTokenApi()
+  async refreshToken(
+    @Res({ passthrough: true }) response: Response,
+    @ExtractUserFromRequest() user: UserContextWithDeviceIdDto,
+  ): Promise<RefreshTokenViewDto> {
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new UpdateTokensCommand(user.deviceId, user.userId),
+    );
+
+    response.cookie(refreshToken, 'value', {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
   }
 
   @Post('password-recovery')

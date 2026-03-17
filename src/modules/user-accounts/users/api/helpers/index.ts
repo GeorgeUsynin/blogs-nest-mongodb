@@ -1,0 +1,1 @@
+export { parseUserAgent } from './parseUserAgent';

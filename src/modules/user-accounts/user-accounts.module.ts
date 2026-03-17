@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import {
   AuthController,
   authProviders,
-  useCases,
+  usersUseCases,
   User,
   UserSchema,
   UsersController,
@@ -20,13 +20,23 @@ import {
   UsersExternalRepository,
 } from './users/infrastructure';
 import { UserAccountsConfig } from './users/config';
+import {
+  Device,
+  DeviceSchema,
+  DevicesController,
+  devicesProviders,
+  devicesUseCases,
+} from './devices';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Device.name, schema: DeviceSchema },
+    ]),
     NotificationsModule,
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, DevicesController],
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -54,12 +64,15 @@ import { UserAccountsConfig } from './users/config';
     },
     ...usersProviders,
     ...authProviders,
-    ...useCases,
+    ...usersUseCases,
+    ...devicesProviders,
+    ...devicesUseCases,
   ],
   exports: [
     MongooseModule,
     UsersExternalRepository,
     UsersExternalQueryRepository,
+    UserAccountsConfig,
   ],
 })
 export class UserAccountsModule {}

@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtHeaderPayloadDto, UserContextDto } from '../dto';
 import { UnauthorizedHttpException } from '../../../../../core/exceptions';
 import { UsersRepository } from '../../infrastructure';
+import { UserAccountsConfig } from '../../config';
 
 @Injectable()
 export class JwtHeaderStrategy extends PassportStrategy(
@@ -11,18 +12,18 @@ export class JwtHeaderStrategy extends PassportStrategy(
   'jwt-header',
 ) {
   constructor(
-    // protected userAccountConfig: UserAccountsConfig,
+    protected userAccountsConfig: UserAccountsConfig,
     private usersRepository: UsersRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      // secretOrKey: userAccountConfig.JWT_ACCESS_SECRET,
-      secretOrKey: process.env.JWT_ACCESS_SECRET!,
+      secretOrKey: userAccountsConfig.JWT_ACCESS_SECRET,
     });
   }
 
   async validate(payload: JwtHeaderPayloadDto): Promise<UserContextDto> {
+    debugger;
     // Checking if user exists
     const isUserExists = Boolean(
       await this.usersRepository.findById(payload.userId),
